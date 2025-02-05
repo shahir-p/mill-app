@@ -35,16 +35,18 @@
         .homeBody {
             flex-grow: 1;
             /* margin-top: 60px; */
-            padding: 20px 40px;
+            padding: px 40px;
             /* background-color: red; */
             display: flex;
             /* grid-template-columns: 40% 60%; */
             /* border: 2px solid */
+            /* background-color:beige; */
         }
 
         .form-container {
             display: block;
             padding: 30px;
+            
             /* margin-top: 20px; */
         }
 
@@ -55,7 +57,7 @@
         }
 
         .billBox {
-            
+           
             border: 2px solid;
             border-radius: 10px;
             margin: 20px;
@@ -68,9 +70,19 @@
         }
 
         input {
+
             border: none;
             width: 100%;
             padding: 0px;
+        }
+        label{
+            font-size: 20px;
+        }
+
+        .input {
+            height: 50px; 
+           width: 350px; 
+           border: 1px solid black;
         }
 
         .table-container {
@@ -124,12 +136,14 @@
             font-size: 30px;
             font-weight: bold;
             cursor: pointer;
+            border-radius: 15px;
         }
+
         .print:hover {
-           
+
             background-color: rgb(63, 149, 63);
-           color: white;
-           
+            color: white;
+
         }
 
         #creditFields {
@@ -140,15 +154,20 @@
 
 
         }
-        #creditFields label{
+
+        #creditFields label {
             font-size: 25px;
         }
-        #initialPayment{
+
+        #initialPayment {
             height: 80px;
+            flex-grow: 1;
             width: 40rem;
             font-size: 25px;
-            
+            border: 1px solid black;
+
         }
+
         .TOTAL {
             width: 100%;
             height: 100%;
@@ -159,11 +178,12 @@
             align-items: center;
             font-size: 30px;
             font-weight: bold;
+            border-radius: 15px;
         }
 
         .credTotal {
             height: 100%;
-            width:100%;
+            width: 100%;
             background-color: rgb(0, 0, 0);
             text-align: center;
             display: flex;
@@ -172,25 +192,36 @@
             font-size: 30px;
             color: white;
             font-weight: bold;
+            border-radius: 15px;
             /*   */
         }
-        .valuesContainer{
+
+        .valuesContainer {
             flex-grow: 1;
             /* height: 90vh; */
             text-align: center;
             padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* background-color: beige; */
+            /* text-align: center; */
+            /* align-items: center; */
+
         }
-        .values{
+
+        .values {
             height: 100px;
-           flex-grow: 1;
-            background-color: red;
+            flex-grow: 1;
+            /* background-color: red; */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items:center;
-            margin: 20px;
+            align-items: center;
+            /* margin: 20px; */
             margin-bottom: 50px;
-           
+
+
         }
 
         /* Media Queries for Responsiveness */
@@ -242,7 +273,7 @@
         </div>
         <!-- Fixed billRow -->
 
-        <div class="d-flex align-items-center ms-5 p-3">
+        <div class="d-flex align-items-center ms-3 p-3">
             <img width="30px" height="30px" src="./icons/back.png" alt="" id="navigate">
             <h1 class="ms-4">Bill</h1>
         </div>
@@ -254,14 +285,14 @@
                     <div class="d-flex gap-0 column-gap-5 mb-3 ">
                         <div class="mb-1">
                             <label for="customerName" class="form-label">Customer Name :</label>
-                            <input type="text" class="form-control" id="customerNameName"
+                            <input type="text" class="form-control input" id="customerNameName"
                                 placeholder="Enter Customer name" required>
                         </div>
 
                         <div class="mb-1">
                             <label for="phoneNumber" class="form-label">Phone Number :</label>
-                            <input type="tel" class="form-control" id="phoneNumber" placeholder="Enter phoneNumber"
-                                maxlength="10" required>
+                            <input type="tel" class="form-control input" id="phoneNumber"
+                                placeholder="Enter phoneNumber" maxlength="10" required>
                         </div>
 
                     </div>
@@ -270,14 +301,14 @@
                     <div class="d-flex gap-0 column-gap-5">
                         <div class="mb-1">
                             <label for="dateField" class="form-label">Select Date:</label>
-                            <input type="text" id="dateField" class="form-control" readonly placeholder="dd-mm-yyyy"
-                                required>
+                            <input type="text" id="dateField" class="form-control input" readonly
+                                placeholder="dd-mm-yyyy" required>
 
                         </div>
 
                         <div class="mb-1">
                             <label for="transactionType" class="form-label">Transaction Type:</label>
-                            <select id="transactionType" class="form-control" required>
+                            <select id="transactionType" class="form-control input" required>
                                 <option value="credit">Credit</option>
                                 <option value="debit">Debit</option>
 
@@ -312,7 +343,7 @@
                     </table>
                 </div>
 
-               
+
 
                 <div class="save  " id="save" style="display: none;">
 
@@ -324,8 +355,8 @@
 
                 <div class=" save cerditsave" id="credit" style="display: flex;">
 
-                    
-                    
+
+
                 </div>
 
 
@@ -334,22 +365,29 @@
 
             </div>
 
-            <div class="valuesContainer" id="values" >
-                <div id="creditFields" class="gap-0 column-gap-5 ms-4 me-2">
+            <div class="valuesContainer" id="values">
+                <div class="values">
+                <div id="creditFields" class="gap-0  ">
                     <div>
                         <label for="initialPayment" class="form-label">Paying Amount:</label>
-                        <input type="number" id="initialPayment" class="form-control"
-                            placeholder="Enter paying Amount">
+                        <input type="number" id="initialPayment" class="form-control" placeholder="Enter paying Amount">
 
                     </div>
-                    
+
                 </div>
-                <div class="values"><div class="credTotal">Total : <span id="credtotal"></span> </div></div>
-                <div class="values"><div class="TOTAL">
-                    Balance : <span id="balanceAmount"></span>
-                </div></div>
-                <div class="values"><div class="print " id="creditsave">Save & Print</div></div>
-               
+                </div>
+                <div class="values">
+                    <div class="credTotal">Total : <span id="credtotal"></span> </div>
+                </div>
+                <div class="values">
+                    <div class="TOTAL">
+                        Balance : <span id="balanceAmount"></span>
+                    </div>
+                </div>
+                <div class="values">
+                    <div class="print " id="creditsave">Save & Print</div>
+                </div>
+
             </div>
 
 
@@ -360,7 +398,7 @@
             // Firebase imports
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
             import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
-        
+
             // Firebase configuration
             const firebaseConfig = {
                 apiKey: "AIzaSyBZ_mkqt1dB2_uLRGamOxxjcOjgxntL8gY",
@@ -371,11 +409,11 @@
                 appId: "1:304225841532:web:c09b203608227e991bb4f9",
                 measurementId: "G-VRXZKDPYPX",
             };
-        
+
             // Initialize Firebase
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
-        
+
             // Validation and saving logic
             window.validateAndSaveTransaction = async function validateAndSaveTransaction() {
                 try {
@@ -387,59 +425,59 @@
                     const initialPayment = document.getElementById("initialPayment").value;
                     const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
 
-                   
-        
+
+
                     if (!customerName) {
                         showAlert("Customer name is required.", 2500);
                         return;
                     }
-        
+
                     // Check if customer name already exists in Firestore
                     const billsRef = collection(db, "bills");
                     const customerQuery = query(billsRef, where("customerName", "==", customerName));
                     const querySnapshot = await getDocs(customerQuery);
-        
+
                     if (!querySnapshot.empty) {
                         // Customer name already exists in Firestore
                         showAlert("Customer name already exists.", 2500);
                         return;
                     }
-        
+
                     if (!phoneNumber || isNaN(phoneNumber) || phoneNumber.length !== 10) {
                         showAlert("Please enter a valid 10-digit phone number.", 2500);
                         return;
                     }
-        
+
                     if (!date) {
                         showAlert("Please select a date.", 2500);
                         return;
                     }
-        
+
                     if (!transactionType) {
                         showAlert("Please select a transaction type.", 2500);
                         return;
                     }
-        
+
                     const table = document.getElementById("itemTable").querySelector("tbody");
                     if (!table || table.rows.length === 0) {
                         showAlert("Please add at least one item to the table.", 2500);
                         return;
                     }
-                    if(initialPayment==totalAmount && transactionType==="credit"){
-                        showAlert("change Transaction Type",2500)
+                    if (initialPayment == totalAmount && transactionType === "credit") {
+                        showAlert("change Transaction Type", 2500)
                         return
                     }
-        
+
                     // Check each row for completeness (Item Name, Unit Price, Quantity, Amount)
                     for (let i = 0; i < table.rows.length; i++) {
                         const cells = table.rows[i].querySelectorAll("td");
-        
+
                         // Validate each required field in the row
                         const itemName = cells[1]?.querySelector('input')?.value.trim();
                         const unitPrice = parseFloat(cells[2]?.querySelector('input')?.value.trim() || "0");
                         const quantity = parseInt(cells[3]?.querySelector('input')?.value.trim() || "0");
                         const amount = parseFloat(cells[4]?.textContent.trim() || "0");
-        
+
                         // Check if fields are empty or invalid
                         if (!itemName) {
                             showAlert(`Please enter Item Name for row ${i + 1}.`, 2500);
@@ -458,7 +496,7 @@
                             return;
                         }
                     }
-        
+
                     // If all validation passes, proceed with saving the transaction
                     await window.saveCreditTransaction();
                     window.pdfload(); // Call pdfload after saving to Firestore
@@ -466,7 +504,7 @@
                     console.error("Error during validation and save:", error);
                 }
             };
-        
+
             window.saveCreditTransaction = async function saveCreditTransaction() {
                 try {
                     // Collect customer details
@@ -474,18 +512,18 @@
                     const phoneNumber = document.getElementById("phoneNumber").value;
                     const date = document.getElementById("dateField").value;
                     const transactionType = document.getElementById("transactionType").value;
-        
+
                     // Collect table data (items)
                     const rows = document.querySelectorAll('#itemTable tbody tr');
                     const items = Array.from(rows).map((row) => {
                         const cells = row.querySelectorAll('td');
-        
+
                         // Check if cells contain input fields for item name, unit price, quantity
                         const itemName = cells[1].querySelector('input') ? cells[1].querySelector('input').value : cells[1].textContent;
                         const unitPrice = parseFloat(cells[2].querySelector('input') ? cells[2].querySelector('input').value : cells[2].textContent) || 0;
                         const quantity = parseInt(cells[3].querySelector('input') ? cells[3].querySelector('input').value : cells[3].textContent) || 0;
                         const amount = parseFloat(cells[4].textContent) || 0; // Amount
-        
+
                         return {
                             itemName,
                             unitPrice,
@@ -493,16 +531,16 @@
                             amount
                         };
                     });
-        
+
                     // Collect total, paid amount, and balance amount
                     const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
                     const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
-                    
+
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
-        
+
                     // Get the local date and time
                     const currentDateTime = new Date().toLocaleString(); // Local date and time in human-readable format
-        
+
                     // Prepare transaction history
                     const transactionHistory = [
                         {
@@ -510,7 +548,7 @@
                             timestamp: currentDateTime // Use local date and time
                         }
                     ];
-        
+
                     // Prepare data for Firestore
                     const data = {
                         customerName,
@@ -523,10 +561,10 @@
                         balanceAmount,
                         transactionHistory // Add the transactionHistory array
                     };
-        
+
                     // Upload data to Firestore
                     const docRef = await addDoc(collection(db, "bills"), data);
-        
+
                     console.log("Transaction saved successfully!");
                     window.pdfload();
                     location.reload();
@@ -535,10 +573,10 @@
                     alert("Contact Code 114. @ 9526718126");
                 }
             };
-        
+
             // window.pdfload(); 
         </script>
-        
+
         <script>
             const showAlert = (message, duration = 3000) => {
                 const alertBox = document.getElementById("customAlert");
@@ -552,8 +590,8 @@
             };
             const navigate = document.getElementById("navigate");
             navigate.addEventListener("click", () => {
-            window.location.href = './homePage.html';  // This will navigate to the homepage
-        });
+                window.location.href = './homePage.html';  // This will navigate to the homepage
+            });
 
             // Attach the validation and saving logic to the save button
             document.getElementById("creditsave").addEventListener("click", () => {
@@ -846,7 +884,7 @@
 
             // const addItemButton = document.getElementById('addItemButton');
             const itemTable = document.getElementById('itemTable').querySelector('tbody');
-            maxrow=15
+            maxrow = 15
             let rowCount = 0;
 
             // Enable Add Item button only if the current row is complete
