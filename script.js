@@ -26,9 +26,9 @@ function loginCheck(event) {
     }
 
     // Remove the error message after 3 seconds
-    // if (err.innerHTML !== "") {
-    //   setTimeout(() => {
-    //     err.innerHTML = "";
-    //   }, 3000);
-    // }
+    if (err.innerHTML !== "") {
+      setTimeout(() => {
+        err.innerHTML = "";
+      }, 3000);
+    }
   }
