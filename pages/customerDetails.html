@@ -10,8 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-          @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-        body{
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+        body {
             font-family: "Poppins", serif;
         }
     </style>
@@ -40,12 +41,13 @@
                 <button class="bg-danger text-white" style="width: 200px; font-size: 30px;"
                     id="dltButton">Delete</button>
                 <button class="bg-success text-white" style="width: 200px; font-size: 30px;" id="payButton">Pay</button>
-                <button class="bg-white text-dark" style="width: 50px; font-size: 30px;border: none;" id="Download"><img src="./icons/download.png" alt="" style="width: 100%;"></button>
+                <button class="bg-white text-dark" style="width: 50px; font-size: 30px;border: none;" id="Download"><img
+                        src="./icons/download.png" alt="" style="width: 100%;"></button>
             </div>
         </div>
         <h4 class="mt-2">Phone Number : <span id="phoneNumber">Loading...</span></h4>
         <h5 class="mt-">Date of purchase : <span id="date">Loading...</span></h5>
-        
+
         <h5 class="mt-3">Total Amount : <span id="totalAmount">Loading...</span></h5>
         <h5 class="mt-3">Paid Amount : <span id="initialPayment">Loading...</span></h5>
         <h5 class="mt-3">Balance Amount : <span id="balanceAmount">Loading...</span></h5>
@@ -134,7 +136,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, updateDoc, doc, arrayUnion, deleteDoc  } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, updateDoc, doc, arrayUnion, deleteDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -179,7 +181,7 @@
                     const totalAmount = customerData.totalAmount || 0;
                     currentBalance = customerData.balanceAmount || totalAmount - initialPayment;
                     const numberPhone = customerData.phoneNumber;
-                    const Date=customerData.date;
+                    const Date = customerData.date;
                     const transaction = customerData.transactionType;
 
                     document.getElementById("initialPayment").textContent = initialPayment;
@@ -243,20 +245,22 @@
                 const timestampString = transaction.timestamp;
                 const timestamp = new Date(timestampString);
 
-                // Format the date and time
-                const date = timestamp.toLocaleDateString("en-GB");
+                // Format the date manually to ensure consistency
+                const day = String(timestamp.getDate()).padStart(2, '0'); // Get day (2 digits)
+                const month = String(timestamp.getMonth() + 1).padStart(2, '0'); // Get month (2 digits)
+                const year = timestamp.getFullYear(); // Get full year
+                const date = `${day}/${month}/${year}`; // Format in dd/mm/yyyy
+
+                // Format the time
                 const time = timestamp.toLocaleTimeString();
 
-                // Calculate the balance after this transaction
-
-
+                // Add the row data
                 row.innerHTML = `
             <td>${index + 1}</td>
             <td>${date}</td>
             <td>${time}</td>
-            <td>${transaction.paidAmount}</td>`
-           
-        ;
+            <td>${transaction.paidAmount}</td>
+        `;
 
                 // Add the row to the table
                 paymentHistoryTableBody.appendChild(row);
@@ -284,7 +288,7 @@
                     <td>${item.unitPrice}</td>
                     <td>${item.quantity}</td>
                     <td>${item.amount}</td>`
-                ;
+                    ;
                 productTableBody.appendChild(row);
             });
         }
@@ -303,8 +307,8 @@
 
             if (isNaN(paymentAmount) || paymentAmount <= 0 || paymentAmount > currentBalance) {
                 showAlert("Please enter a valid amount up to the balance amount.", 2500);
-                        
-             
+
+
                 return;
             }
 
@@ -361,15 +365,15 @@
         });
 
         const showAlert = (message, duration = 3000) => {
-                const alertBox = document.getElementById("customAlert");
-                alertBox.textContent = message;
-                alertBox.style.display = "block";
+            const alertBox = document.getElementById("customAlert");
+            alertBox.textContent = message;
+            alertBox.style.display = "block";
 
-                // Hide the alert after the specified duration
-                setTimeout(() => {
-                    alertBox.style.display = "none";
-                }, duration);
-            };
+            // Hide the alert after the specified duration
+            setTimeout(() => {
+                alertBox.style.display = "none";
+            }, duration);
+        };
 
 
         fetchCustomerDetails();
