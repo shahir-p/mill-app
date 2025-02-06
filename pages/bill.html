@@ -15,244 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js"></script>
 
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-
-
-    <style>
-        .homeContainer {
-            height: 100vh;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-      
-            padding: 0px 40px;
-        }
-
-        .head {
-            margin-left: 0px;
-        }
-
-        .homeBody {
-            flex-grow: 1;
-            /* margin-top: 60px; */
-            padding: 10px 40px;
-            /* background-color: red; */
-            display: flex;
-            /* grid-template-columns: 40% 60%; */
-            /* border: 2px solid */
-            /* background-color:beige; */
-        }
-
-        .form-container {
-            display: block;
-            padding: 30px;
-            
-            /* margin-top: 20px; */
-        }
-
-        .success-message {
-            display: none;
-            color: green;
-            font-weight: bold;
-        }
-
-        .billBox {
-           
-            border: 2px solid;
-            border-radius: 10px;
-            margin: 20px;
-        }
-
-
-        .header {
-            font-weight: bold;
-            background-color: #f4f4f4;
-        }
-
-        input {
-
-            border: none;
-            width: 100%;
-            padding: 0px;
-        }
-        label{
-            font-size: 20px;
-        }
-
-        .input {
-            height: 50px; 
-           width: 350px; 
-           border: 1px solid black;
-        }
-
-        .table-container {
-            margin-top: 20px;
-        }
-
-        .item-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .item-table th,
-        .item-table td {
-            border: 1px solid #ddd;
-            text-align: center;
-
-        }
-
-        .item-table th {
-            background-color: #f4f4f4;
-            font-weight: bold;
-        }
-
-        .delete-btn {
-            color: red;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .save {
-            height: 80px;
-            width: 100%;
-            /* background-color: lightblue; */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-
-
-
-
-        .print {
-            width: 100%;
-            height: 100%;
-            background-color: rgb(21, 141, 21);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 15px;
-        }
-
-        .print:hover {
-
-            background-color: rgb(63, 149, 63);
-            color: white;
-
-        }
-
-        #creditFields {
-            display: flex;
-            align-items: center;
-            /* width: 100%;  width: 100%; */
-            /* background-color: lightblue; */
-
-
-        }
-
-        #creditFields label {
-            font-size: 25px;
-        }
-
-        #initialPayment {
-            height: 80px;
-            flex-grow: 1;
-            width: 30rem;
-            font-size: 25px;
-            border: 1px solid black;
-
-        }
-
-        .TOTAL {
-            width: 100%;
-            height: 100%;
-            background-color: rgb(69, 171, 239);
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            font-weight: bold;
-            border-radius: 15px;
-        }
-
-        .credTotal {
-            height: 100%;
-            width: 100%;
-            background-color: rgb(0, 0, 0);
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            color: white;
-            font-weight: bold;
-            border-radius: 15px;
-            /*   */
-        }
-
-        .valuesContainer {
-            flex-grow: 1;
-            /* height: 90vh; */
-            text-align: center;
-            padding-top: 30px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            /* background-color: beige; */
-            /* text-align: center; */
-            /* align-items: center; */
-
-        }
-
-        .values {
-            height: 100px;
-            flex-grow: 1;
-            /* background-color: red; */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            /* margin: 20px; */
-            margin-bottom: 50px;
-
-
-        }
-
-        /* Media Queries for Responsiveness */
-        @media (max-width: 768px) {
-            .billRow {
-                padding: 10px;
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .homeBody {
-                margin-top: 120px;
-                padding: 20px;
-            }
-        }
-
-        @media (max-width: 576px) {
-            .billRow {
-                padding: 10px;
-                display: flex;
-                flex-direction: row;
-                align-items: flex-start;
-                text-align: left;
-            }
-
-            .homeBody {
-                margin-top: 140px;
-                padding: 10px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="./bill.css">
 </head>
 
 <body>
@@ -273,7 +36,7 @@
         </div>
         <!-- Fixed billRow -->
 
-        <div class="d-flex align-items-center ms-3 p-3">
+        <div class=" billrow">
             <img width="30px" height="30px" src="./icons/back.png" alt="" id="navigate">
             <h1 class="ms-4">Bill</h1>
         </div>
@@ -282,7 +45,7 @@
 
             <div class="billBox">
                 <div class="form-container " id="billForm">
-                    <div class="d-flex gap-0 column-gap-5 mb-3 ">
+                    <div class=" inputDiv">
                         <div class="mb-1">
                             <label for="customerName" class="form-label">Customer Name :</label>
                             <input type="text" class="form-control input" id="customerNameName"
@@ -298,7 +61,7 @@
                     </div>
 
 
-                    <div class="d-flex gap-0 column-gap-5">
+                    <div class="inputDiv">
                         <div class="mb-1">
                             <label for="dateField" class="form-label">Select Date:</label>
                             <input type="text" id="dateField" class="form-control input" readonly
@@ -364,17 +127,19 @@
 
 
             </div>
+            
 
             <div class="valuesContainer" id="values">
                 <div class="values">
-                <div id="creditFields" class="gap-0  ">
-                    <div>
-                        <label for="initialPayment" class="form-label">Paying Amount:</label>
-                        <input type="number" id="initialPayment" class="form-control" placeholder="Enter paying Amount">
+                    <div id="creditFields" class="gap-0  ">
+                        <div>
+                            <label for="initialPayment" class="form-label">Paying Amount:</label>
+                            <input type="number" id="initialPayment" class="form-control"
+                                placeholder="Enter paying Amount">
+
+                        </div>
 
                     </div>
-
-                </div>
                 </div>
                 <div class="values">
                     <div class="credTotal">Total : <span id="credtotal"></span> </div>
@@ -906,7 +671,7 @@
                     <td><input type="number" class="" oninput="calculateAmount(this)" placeholder=""></td>
                     <td><input type="number" class="" oninput="calculateAmount(this)" placeholder=""></td>
                     <td><span class="amount-text">0</span></td>
-                    <td><span class="delete-btn" onclick="deleteRow(this)">&#x2716;</span></td>
+                    <td><span class="delete-btn" onclick="deleteRow(this)"><img src="./icons/cross.png" width="15px" alt=""></span></td>
                 `;
                 itemTable.appendChild(row);
                 toggleDeleteButtonsVisibility();

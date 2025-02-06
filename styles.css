@@ -1,7 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 *{
     margin: 0px;
     padding: 0px;
     box-sizing: border-box;
+    font-family: "Poppins", serif;
+    
 }
 body{
     background-image: url('https://img.freepik.com/free-photo/view-industrial-sawmill-factory-wood-processing_342744-1443.jpg?t=st=1738752724~exp=1738756324~hmac=e908448d54778c8e81952600360a8701ef5b0b52fc1c1c6c12699a898abb62f8&w=996');

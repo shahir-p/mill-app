@@ -37,8 +37,10 @@
             height: 300px;
             border: 2px solid;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            row-gap: 10px;
         }
 
         @media (max-width: 576px) {
@@ -80,16 +82,14 @@
                 <!-- <button class="bg-success ps-5 pe-5 fs-3 text-white">BILL</button> -->
             </div>
             <div class="homeContent">
-                <div class="homeBox" onclick="billClick()">
+                <div class="homeBox" onclick="billClick()"> 
+                    <img src="./icons/bill.png" width="50px" alt="">
                     <h4>Bill</h4>
                 </div>
                 <div class="homeBox" onclick="customersClick()">
-                    <h4>Customers</h4>
-                </div>
-                <!-- <div class="homeBox" onclick="historyClick()">
-                    <h4>History</h4>
-                </div> -->
-
+                    <img src="./icons/customer.png" width="50px" alt="">
+                    <h4>Customers</h4></div>
+               
             </div>
         </div>
 
