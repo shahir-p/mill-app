@@ -188,8 +188,10 @@
                     const date = document.getElementById("dateField").value.trim();
                     const transactionType = document.getElementById("transactionType").value;
                     const initialPayment = document.getElementById("initialPayment").value;
-                    const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
+                    const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
+                    const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
+                    
 
 
                     if (!customerName) {
@@ -717,6 +719,10 @@
                 calculateTotalAmount();
             };
 
+
+
+
+
             // Calculate amount (unit price * quantity)
             const calculateAmount = (input) => {
                 const row = input.closest('tr');
@@ -734,6 +740,12 @@
                 // enableAddButton();
                 checkAndAddRow();
             };
+
+
+            
+                    const initialPayment = document.getElementById("initialPayment").value;
+                    const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
+                    const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
             // Calculate total amount
             // Prevent initialPayment from changing on row add/delete
@@ -755,10 +767,17 @@
             function debitCheck() {
                 const transactionType = document.getElementById("transactionType").value;
                 const credtotal = parseFloat(document.getElementById("credtotal").textContent || "0");
+                const initialPaymentInput = document.getElementById('initialPayment');
+                const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
+                // console.log(credtotal);
+                
 
                 if (transactionType === "debit") {
+
                     document.getElementById("balanceAmount").textContent = "0";
+                    initialPaymentInput.value=totalAmount
                 } else {
+                    initialPaymentInput.value="0"
                     updateBalance(); // Only update balance; do not modify initialPayment
                 }
             }
@@ -812,9 +831,12 @@
             // Function to update the balance based on total amount and initial payment
             const updateBalance = () => {
                 const totalAmount = parseFloat(document.getElementById('total').textContent) || 0;
+                console.log(totalAmount);
+                
                 const initialPayment = parseFloat(initialPaymentInput.value) || 0;
                 const balance = totalAmount - initialPayment;
                 balanceAmountSpan.textContent = balance.toFixed(0);
+
             };
 
             // Attach the `updateBalance` function to relevant events
