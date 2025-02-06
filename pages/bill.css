@@ -11,13 +11,14 @@
     align-items: center;
     margin-top: 20px;
     margin-left: 30px;
+    /* background-color: orange; */
 }
 
 .homeBody {
     flex-grow: 1;
     padding: 10px 40px;
     display: flex;
-    /* background-color: beige; */
+    background-color: beige;
 }
 
 
@@ -44,6 +45,7 @@
     border: 2px solid;
     border-radius: 10px;
     margin: 20px;
+    background-color: gray;
 }
 
 .inputDiv {
@@ -79,7 +81,7 @@ label {
 
 .delete-btn {
     cursor: pointer;
-   
+
 }
 
 .save {
@@ -196,6 +198,11 @@ label {
 
 /* Media Queries for Responsiveness */
 @media (max-width: 768px) {
+    .homeContainer {
+
+        padding: 0px 20px;
+    }
+
     .billRow {
         padding: 10px;
         flex-direction: column;
@@ -204,6 +211,10 @@ label {
 
     .homeBody {
         flex-direction: column;
+    }
+
+    .billBox {
+        margin: 10px;
     }
 
     .inputDiv {
@@ -216,18 +227,24 @@ label {
 
     }
 }
+
 @media (max-width: 649px) {
     #initialPayment {
         height: 60px;
         flex-grow: 0;
         width: 100%;
-      
-    
+
+
     }
 }
 
 
 @media (max-width: 576px) {
+    .homeContainer {
+
+        padding: 0px 0px;
+    }
+
     .billRow {
         padding: 10px;
         display: flex;
@@ -237,7 +254,36 @@ label {
     }
 
     .homeBody {
-        margin-top: 140px;
+        margin-top: 20px;
         padding: 10px;
+    }
+
+    .billBox {
+        margin: 0px;
+    }
+    table{
+        margin-left: -8px;
+        
+    }
+ 
+    .values {
+ 
+        margin-bottom: 20px;
+    
+    
+    }
+
+}
+@media (min-width: 411px) and (max-width: 431px) {
+    table{
+
+        margin-left: -10px;
+        
+    }
+}
+@media (max-width: 376px) {
+    table{
+        margin-left: -22px;
+        
     }
 }

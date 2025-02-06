@@ -7,7 +7,7 @@
     
 }
 body{
-    background-image: url('https://img.freepik.com/free-photo/view-industrial-sawmill-factory-wood-processing_342744-1443.jpg?t=st=1738752724~exp=1738756324~hmac=e908448d54778c8e81952600360a8701ef5b0b52fc1c1c6c12699a898abb62f8&w=996');
+    background-image: url('./pages/icons/bgm.jpg');
     background-size: cover;
 }
 .form{
