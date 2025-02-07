@@ -59,14 +59,15 @@
             font-weight: 500;
             /* background-color: beige; */
         }
-        .customer-list{
+
+        .customer-list {
             display: flex;
             font-size: 20px;
             font-weight: 800;
         }
-        
 
-    
+
+
         /* .listBox div {
             font-weight: 600;
         } */
@@ -107,21 +108,24 @@
         }
 
         @media (max-width: 980px) {
-            .backname{
+            .backname {
                 margin-bottom: 20px;
             }
+
             .searchbox {
                 margin-left: 20px;
             }
         }
 
         @media (max-width: 700px) {
-            .backname{
+            .backname {
                 margin-bottom: 20px;
             }
+
             .custBody {
                 margin: 10px 20px;
             }
+
             .row {
                 margin-bottom: 20px;
             }
@@ -132,29 +136,31 @@
                 height: 60px;
                 display: flex;
                 border: 1px solid rgb(204, 203, 203);
-                margin-top: 10  px;
+                margin-top: 10 px;
                 margin-left: 20px;
             }
+
             .listBox {
-            font-weight: 500;
-            font-size: 18px;
-        }
+                font-weight: 500;
+                font-size: 18px;
+            }
 
         }
 
 
         @media (max-width: 475px) {
             .listBox {
-           
-            font-weight: 500;
-            font-size: 16px;
-        }
+
+                font-weight: 500;
+                font-size: 16px;
+            }
+
             .customer-item {
-    
-            font-size: 15px;
-            font-weight: 400;
-            /* background-color: beige; */
-        }
+
+                font-size: 15px;
+                font-weight: 400;
+                /* background-color: beige; */
+            }
         }
     </style>
 </head>
@@ -164,7 +170,7 @@
         <div class="row">
             <div class="d-flex align-items-center backname" style="width: 300px;">
                 <img width="30px" height="30px" src="./icons/back.png" alt="" id="navigate">
-                <h1 class="ms-4">Customers</h1>
+                <h2 class="ms-4">Cleared</h2>
             </div>
             <div class="searchbox  p-2 rounded   ">
                 <input type="text" placeholder="Enter Customer Name" id="searchField">
@@ -260,25 +266,28 @@
             const customersRef = collection(db, "bills");
 
             unsubscribe = onSnapshot(customersRef, (snapshot) => {
-                const customers = snapshot.docs.map((doc) => {
-                    const data = doc.data();
+                const customers = snapshot.docs
+                    .map((doc) => {
+                        const data = doc.data();
 
-                    // Extract the latest transaction based on the timestamp field
-                    const latestTransaction = data.transactionHistory
-                        ? data.transactionHistory.reduce((latest, transaction) => {
-                            const currentDate = new Date(transaction.timestamp);
-                            const latestDate = new Date(latest.timestamp);
-                            return currentDate > latestDate ? transaction : latest;
-                        })
-                        : null;
+                        // Extract the latest transaction based on the timestamp field
+                        const latestTransaction = data.transactionHistory
+                            ? data.transactionHistory.reduce((latest, transaction) => {
+                                const currentDate = new Date(transaction.timestamp);
+                                const latestDate = new Date(latest.timestamp);
+                                return currentDate > latestDate ? transaction : latest;
+                            })
+                            : null;
 
-                    return {
-                        ...data,
-                        latestTransactionTimestamp: latestTransaction
-                            ? latestTransaction.timestamp
-                            : null,
-                    };
-                });
+                        return {
+                            ...data,
+                            latestTransactionTimestamp: latestTransaction
+                                ? latestTransaction.timestamp
+                                : null,
+                        };
+                    })
+                    // Filter customers with balanceAmount === 0
+                    .filter((customer) => customer.balanceAmount === 0);
 
                 // Sort customers by the most recent transaction timestamp
                 customers.sort((a, b) => {
@@ -325,7 +334,7 @@
         });
 
         navigate.addEventListener("click", () => {
-            window.location.href = './homePage.html';  // This will navigate to the homepage
+            window.location.href = './customerclassify.html';  // This will navigate to the homepage
         });
 
 

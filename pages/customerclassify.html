@@ -44,7 +44,7 @@
             align-items: center;
 
             display: grid;
-            grid-template-columns: repeat(4, .5fr);
+            grid-template-columns: repeat(2, .5fr);
             column-gap: 50px;
             row-gap: 20px;
         }
@@ -99,44 +99,39 @@
     <div class="homeContainer ">
         <div class="homeBody  ">
             <div class="billRow d-flex justify-content-between ">
-                <h3 class="">Homepage</h3>
+                <div class="d-flex align-items-center backname text-white" style="width: 300px;">
+                    <img width="30px" height="30px" src="./icons/backw.png" alt="" id="navigate">
+                    <h2 class="ms-4">Customers</h2>
+                </div>
                 <!-- <button class="bg-success ps-5 pe-5 fs-3 text-white">BILL</button> -->
             </div>
             <div class="homeContent">
-                <div class="homeBox" onclick="billClick()">
-                    <img src="./icons/bill.png" width="50px" alt="">
-                    <h4>Bill</h4>
+                <div class="homeBox" onclick=" pendingClick() ">
+                    <img src="./icons/pending1.png" width="50px" alt="">
+                    <h4> Payment Pending</h4>
                 </div>
-                <div class="homeBox" onclick="customersClick()">
-                    <img src="./icons/customer.png" width="50px" alt="">
-                    <h4>Customers</h4>
+                <div class="homeBox" onclick="fullClick()">
+                    <img src="./icons/success.png" width="50px" alt="">
+                    <h4>Payment Cleared</h4>
                 </div>
-                <div class="homeBox" onclick="debiClick()">
-                    <img src="./icons/wood.png" width="50px" alt="">
-                    <h4>Purchase</h4>
-                </div>
-                <div class="homeBox" onclick="overClick()">
-                    <img src="./icons/overview.png" width="50px" alt="">
-                    <h4>Overview</h4>
-                </div>
+               
 
             </div>
         </div>
 
 </body>
 <script>
-    function billClick() {
-        window.location.href = 'bill.html';
+    function pendingClick() {
+        window.location.href = 'customersPending.html';
     }
-    function customersClick() {
-        window.location.href = 'customerclassify.html';
+    function fullClick() {
+        window.location.href = 'customersCleared.html';
     }
-    function debiClick() {
-        window.location.href = 'debit.html';
-    }
-    function overClick() {
-        window.location.href = 'overview.html';
-    }
+
+    navigate.addEventListener("click", () => {
+            window.location.href = './homePage.html';  // This will navigate to the homepage
+        });
+    
 </script>
 
 </html>

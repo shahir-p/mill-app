@@ -349,8 +349,8 @@
                     const docRef = await addDoc(collection(db, "purchase"), data);
 
                     console.log("Transaction saved successfully!");
-                   
-                    location.reload();
+                    window.location.href = './debit.html'
+                    // location.reload();
                 } catch (error) {
                     console.error("Error saving data: ", error);
                     alert("Contact Code 114. @ 9526718126");
