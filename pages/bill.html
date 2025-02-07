@@ -46,34 +46,47 @@
             <div class="billBox">
                 <div class="form-container " id="billForm">
                     <div class=" inputDiv">
-                        <div class="mb-1">
+                        <div >
                             <label for="customerName" class="form-label">Customer Name :</label>
                             <input type="text" class="form-control input" id="customerNameName"
-                                placeholder="Enter Customer name" required>
+                                placeholder="Enter Customer Name" required>
                         </div>
 
-                        <div class="mb-1">
+                        <div >
                             <label for="phoneNumber" class="form-label">Phone Number :</label>
                             <input type="tel" class="form-control input" id="phoneNumber"
-                                placeholder="Enter phoneNumber" maxlength="10" required>
+                                placeholder="Enter Phone Number" maxlength="10" required>
                         </div>
 
                     </div>
 
 
                     <div class="inputDiv">
-                        <div class="mb-1">
+                        <div>
                             <label for="dateField" class="form-label">Select Date:</label>
                             <input type="text" id="dateField" class="form-control input" readonly
                                 placeholder="dd-mm-yyyy" required>
 
                         </div>
 
-                        <div class="mb-1">
+                        <div>
                             <label for="transactionType" class="form-label">Transaction Type:</label>
                             <select id="transactionType" class="form-control input" required>
                                 <option value="credit">Credit</option>
-                                <option value="debit">Debit</option>
+                                <option value="Full Payment">Full Payment</option>
+
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class="inputDiv">
+                       
+
+                        <div >
+                            <label for="transactionMode" class="form-label">Transaction Mode:</label>
+                            <select id="transactionMode" class="form-control input" required>
+                                <option value="cash">Cash</option>
+                                <option value="UPI">UPI</option>
 
 
                             </select>
@@ -187,6 +200,7 @@
                     const phoneNumber = document.getElementById("phoneNumber").value.trim();
                     const date = document.getElementById("dateField").value.trim();
                     const transactionType = document.getElementById("transactionType").value;
+                    const transactionMode = document.getElementById("transactionMode").value;
                     const initialPayment = document.getElementById("initialPayment").value;
                     const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
@@ -266,7 +280,7 @@
 
                     // If all validation passes, proceed with saving the transaction
                     await window.saveCreditTransaction();
-                    window.pdfload(); // Call pdfload after saving to Firestore
+                     // Call pdfload after saving to Firestore
                 } catch (error) {
                     console.error("Error during validation and save:", error);
                 }
@@ -279,6 +293,7 @@
                     const phoneNumber = document.getElementById("phoneNumber").value;
                     const date = document.getElementById("dateField").value;
                     const transactionType = document.getElementById("transactionType").value;
+                    const transactionMode = document.getElementById("transactionMode").value;
 
                     // Collect table data (items)
                     const rows = document.querySelectorAll('#itemTable tbody tr');
@@ -322,6 +337,7 @@
                         phoneNumber,
                         date,
                         transactionType,
+                        transactionMode,
                         items,
                         totalAmount,
                         initialPayment,
@@ -428,6 +444,9 @@
                 // Add transaction type from the select dropdown
                 const transactionType = document.getElementById('transactionType').value;
                 pdf.text("Transaction Type: " + transactionType, 10, y);
+                y += 10;
+                const transactionMode = document.getElementById('transactionMode').value;
+                pdf.text("Transaction Mode: " + transactionMode, 10, y);
                 y += 10;
                 pdf.setFontSize(14);
                 pdf.text("Product items :", 10, y);
@@ -569,6 +588,7 @@
 
                 // Save PDF
                 pdf.save('bill.pdf');
+               
             };
 
         </script>
@@ -760,11 +780,11 @@
                 document.getElementById('credtotal').textContent = sum.toFixed(0);
 
                 // Call other dependent functions, but do not modify initialPayment
-                debitCheck();
+                FullPaymentCheck();
                 updateBalance(); // Update balance based on existing initialPayment
             };
-            // Debit check logic updated to ensure initialPayment is user-controlled
-            function debitCheck() {
+            //FullPayment check logic updated to ensure initialPayment is user-controlled
+            function FullPaymentCheck() {
                 const transactionType = document.getElementById("transactionType").value;
                 const credtotal = parseFloat(document.getElementById("credtotal").textContent || "0");
                 const initialPaymentInput = document.getElementById('initialPayment');
@@ -772,7 +792,7 @@
                 // console.log(credtotal);
                 
 
-                if (transactionType === "debit") {
+                if (transactionType === "Full Payment") {
 
                     document.getElementById("balanceAmount").textContent = "0";
                     initialPaymentInput.value=totalAmount
@@ -784,7 +804,7 @@
 
 
             document.getElementById("transactionType").addEventListener("change", () => {
-                debitCheck();
+                FullPaymentCheck();
             });
 
 

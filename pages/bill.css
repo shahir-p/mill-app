@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+body {
+    font-family: "Poppins", serif;
+}
 .homeContainer {
     height: 100vh;
     width: 100%;
@@ -29,7 +33,7 @@
 
 .form-container {
     display: block;
-    padding: 30px;
+    padding: 10px;
 
     /* margin-top: 20px; */
 }
@@ -44,7 +48,8 @@
 
     border: 2px solid;
     border-radius: 10px;
-    margin: 20px;
+    margin-right: 10px;
+    padding:10px;
     /* background-color: gray; */
 }
 
@@ -67,15 +72,18 @@ input {
 }
 
 label {
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .input {
-    height: 50px;
+    height: 40px;
     width: 350px;
     border: 1px solid black;
 }
-
+.table th{
+    font-size: 15px;
+    font-weight: 600;
+}
 
 
 

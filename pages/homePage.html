@@ -10,13 +10,15 @@
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-        body{
+
+        body {
             font-family: "Poppins", serif;
             position: relative;
             background-image: url('./icons/bgm.jpg');
             opacity: 10;
             background-size: cover;
         }
+
         .homeContainer {
             height: 100vh;
             width: 100%;
@@ -24,8 +26,9 @@
             flex-direction: column;
             justify-content: center;
         }
-        h3{
-            margin-top: 30px;
+
+        h3 {
+            margin-top: 10px;
             color: white;
         }
 
@@ -39,10 +42,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-           
+
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, .5fr);
             column-gap: 50px;
+            row-gap: 20px;
         }
 
         .homeBox {
@@ -53,7 +57,7 @@
             align-items: center;
             justify-content: center;
             row-gap: 10px;
-            background-color: rgb(255, 255, 255,0.7);
+            background-color: rgb(255, 255, 255, 0.7);
             border-radius: 15px;
             cursor: pointer;
         }
@@ -67,17 +71,19 @@
             .billRow {
                 padding: 10px;
             }
+
             .homeContent {
-            height: 600px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-           
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            column-gap: 50px;
-            row-gap: 20px;
-        }
+                height: 600px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                display: grid;
+                grid-template-columns: repeat(1, 1fr);
+                column-gap: 50px;
+                row-gap: 20px;
+            }
+
             .homeBox {
                 height: 300px;
                 border: 2px solid;
@@ -97,26 +103,35 @@
                 <!-- <button class="bg-success ps-5 pe-5 fs-3 text-white">BILL</button> -->
             </div>
             <div class="homeContent">
-                <div class="homeBox" onclick="billClick()"> 
+                <div class="homeBox" onclick="billClick()">
                     <img src="./icons/bill.png" width="50px" alt="">
                     <h4>Bill</h4>
                 </div>
                 <div class="homeBox" onclick="customersClick()">
                     <img src="./icons/customer.png" width="50px" alt="">
-                    <h4>Customers</h4></div>
-               
+                    <h4>Customers</h4>
+                </div>
+                <div class="homeBox" onclick="billClick()">
+                    <img src="./icons/bill.png" width="50px" alt="">
+                    <h4>Debit</h4>
+                </div>
+                <div class="homeBox" onclick="customersClick()">
+                    <img src="./icons/customer.png" width="50px" alt="">
+                    <h4>Overview</h4>
+                </div>
+
             </div>
         </div>
 
 </body>
 <script>
-    function billClick(){
+    function billClick() {
         window.location.href = 'bill.html';
     }
-    function customersClick(){
+    function customersClick() {
         window.location.href = 'customers.html';
     }
-    function historyClick(){
+    function historyClick() {
         window.location.href = 'history.html';
     }
 </script>
