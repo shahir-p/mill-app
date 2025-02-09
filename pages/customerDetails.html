@@ -50,16 +50,82 @@
             border-radius: 15px;
             color: white;
             font-size: 22px;
+            cursor: pointer;
         }
 
         .properties {
             line-height: 1.5;
+            display: flex;
+            justify-content: space-between;
         }
 
         .modal {
             overflow-y: visible !important;
             /* Ensure dropdown options are not clipped */
         }
+        .payButton:hover{
+            background-color: rgb(59, 135, 59);
+
+        }
+        .tableOuter{
+            border: 1px solid black;
+            border-radius: 20px;
+            width: 50%;
+        }
+        thead tr th{
+            font-weight: 600;
+        }
+        .totalAmount{
+            background-color: black;
+            color: white;
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .initialPayment{
+            background-color: rgb(69, 171, 239);
+            color: white;
+            padding: 8px;
+            border-radius: 10px;
+        }
+        .balanceAmount{
+            background-color:rgb(241, 49, 49);
+            padding: 8px;
+            border-radius: 10px;
+            color: white;
+        }
+        .gridBox{
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        @media (max-width: 992px) {
+            .properties {
+            line-height: 1.5;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+            .gridBox{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 100%;
+        }
+        .tableOuter{
+            border: 1px solid black;
+            border-radius: 20px;
+            width: 100%;
+        }
+        .colorBox{
+            text-align: center;
+        }
+        }
+        @media (max-width: 460px) {
+            thead tr th{
+            font-weight: 500;
+        }
+        }
+        
     </style>
 </head>
 
@@ -91,20 +157,26 @@
         </div>
 
         <div class="properties">
-            <h4 class="mt-2">Name: <span id="customerName">Loading...</span></h4>
-            <h5 class="mt-">Phone Number : <span id="phoneNumber">Loading...</span></h5>
-            <h5 class="mt-">Date of purchase : <span id="date">Loading...</span></h5>
-            <h5 class="mt-2">Transaction Type: <span id="TransactionType">Loading...</span></h5>
-            <h5 class="mt-2">Total Amount : <span id="totalAmount">Loading...</span></h5>
-            <h5 class="mt-2">Paid Amount : <span id="initialPayment">Loading...</span></h5>
-            <h5 class="mt-2">Balance Amount : <span id="balanceAmount">Loading...</span></h5>
+            <div>
+                <h4 class="mt-2">Name: <span id="customerName">Loading...</span></h4>
+                <h5 class="mt-2">Invoice No : <span id="InvoiceNo">Loading...</span></h5>
+                <h5 class="mt-">Phone Number : <span id="phoneNumber">Loading...</span></h5>
+                <h5 class="mt-">Date of purchase : <span id="date">Loading...</span></h5>
+                <h5 class="mt-2">Transaction Type: <span id="TransactionType">Loading...</span></h5>
+            </div>
+          <div class="colorBox">
+               
+                <h5 class="mt-2 totalAmount">Total Amount : <span id="totalAmount">Loading...</span></h5>
+                <h5 class="mt-2 initialPayment">Paid Amount : <span id="initialPayment">Loading...</span></h5>
+                <h5 class="mt-2 balanceAmount">Balance Amount : <span id="balanceAmount">Loading...</span></h5>
+          </div>
 
 
 
         </div>
 
-        <div class="d-flex justify-content-around mt-3">
-            <div style="width: 50%;" class="border  rounded border-3 p-2 border-dark mt-2">
+        <div class=" mt-3 gridBox">
+            <div class=" tableOuter  p-2 mt-2">
                 <h5 class="">Product Items :</h5>
                 <table class="table table-bordered border   mt-4">
                     <thead>
@@ -122,7 +194,7 @@
                 </table>
             </div>
 
-            <div style="width: 45%;" id="history" class="border border-3 border-dark mt-2 p-2 rounded">
+            <div  id="history" class=" tableOuter  mt-2 p-2 ">
                 <h5 class="">Payment History :</h5>
                 <table class="table table-bordered border  mt-4">
                     <thead>
@@ -232,6 +304,7 @@
                     const numberPhone = customerData.phoneNumber;
                     const Date = customerData.date;
                     const transaction = customerData.transactionType;
+                    const InvoiceNo =customerData.invoiceNo;
 
 
                     document.getElementById("initialPayment").textContent = initialPayment;
@@ -240,6 +313,7 @@
                     document.getElementById("phoneNumber").textContent = numberPhone;
                     document.getElementById("TransactionType").textContent = transaction;
                     document.getElementById("date").textContent = Date;
+                    document.getElementById("InvoiceNo").textContent = InvoiceNo;
 
                     const payButton = document.getElementById('payButton');
 
@@ -399,6 +473,10 @@
 
 
         fetchCustomerDetails();
+        navigate.addEventListener("click", () => {
+            window.history.back();
+        });
+    
     </script>
 
 </body>
