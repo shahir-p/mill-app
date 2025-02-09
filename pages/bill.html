@@ -87,8 +87,6 @@
                             <select id="transactionMode" class="form-control input" required>
                                 <option value="cash">Cash</option>
                                 <option value="UPI">UPI</option>
-
-
                             </select>
                         </div>
                     </div>
@@ -175,7 +173,7 @@
         <script type="module">
             // Firebase imports
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-            import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+            import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
             // Firebase configuration
             const firebaseConfig = {
@@ -288,12 +286,22 @@
 
             window.saveCreditTransaction = async function saveCreditTransaction() {
                 try {
+                    const billsCollectionRef = collection(db, "bills");
+                    const billsSnapshot = await getDocs(billsCollectionRef);
+
                     // Collect customer details
                     const customerName = document.getElementById("customerNameName").value;
                     const phoneNumber = document.getElementById("phoneNumber").value;
                     const date = document.getElementById("dateField").value;
                     const transactionType = document.getElementById("transactionType").value;
                     const transactionMode = document.getElementById("transactionMode").value;
+
+
+                    
+                    // Generate a new invoice number based on the document count
+                    const newInvoiceNo = billsSnapshot.size + 1; // `size` gives the number of documents
+                    const formattedInvoiceNo = `INV-${String(newInvoiceNo).padStart(3, '0')}`; // Format as INV-001, INV-002, etc.
+                    const invoiceNo=formattedInvoiceNo;
 
                     // Collect table data (items)
                     const rows = document.querySelectorAll('#itemTable tbody tr');
@@ -327,17 +335,18 @@
                     const transactionHistory = [
                         {
                             paidAmount: initialPayment,
-                            timestamp: currentDateTime // Use local date and time
+                            timestamp: currentDateTime ,
+                            transactionMode,
                         }
                     ];
 
                     // Prepare data for Firestore
                     const data = {
+                        invoiceNo,
                         customerName,
                         phoneNumber,
                         date,
                         transactionType,
-                        transactionMode,
                         items,
                         totalAmount,
                         initialPayment,
@@ -349,8 +358,12 @@
                     const docRef = await addDoc(collection(db, "bills"), data);
 
                     console.log("Transaction saved successfully!");
+                    window.InvoiceNo = invoiceNo;
+                    console.log(InvoiceNo);
+                    
                     window.pdfload();
                     location.reload();
+
                 } catch (error) {
                     console.error("Error saving data: ", error);
                     alert("Contact Code 114. @ 9526718126");
@@ -397,6 +410,8 @@
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF();
                 let y = 20;
+
+                const invoiceNo =( window.InvoiceNo);
 
                 pdf.setFontSize(20);
                 pdf.setFont("helvetica", "bold");
@@ -458,20 +473,20 @@
                 pdf.setFont("helvetica", "bold");
                 pdf.text("# INVOICE", invoiceX, invoiceY);  // Position it on the right side (x = invoiceX)
 
-                let invoiceNo = localStorage.getItem('invoiceNo');
-                if (!invoiceNo) {
-                    invoiceNo = 100; // Starting invoice number
-                } else {
-                    invoiceNo = parseInt(invoiceNo) + 1; // Increment the invoice number by 1
-                }
+                // let invoiceNo = localStorage.getItem('invoiceNo');
+                // if (!invoiceNo) {
+                //     invoiceNo = 100; // Starting invoice number
+                // } else {
+                //     invoiceNo = parseInt(invoiceNo) + 1; // Increment the invoice number by 1
+                // }
 
-                // Save the updated invoice number back to localStorage
-                localStorage.setItem('invoiceNo', invoiceNo);
+                // // Save the updated invoice number back to localStorage
+                // localStorage.setItem('invoiceNo', invoiceNo);
 
                 // Add "Invoice No:" below "INVOICE"
                 const invoiceNoY = invoiceY + 8; // Position it 10 units below "INVOICE"
                 pdf.setFontSize(12);
-                pdf.text("invoice no: " + invoiceNo, invoiceX, invoiceNoY);
+                pdf.text("#" + invoiceNo, invoiceX, invoiceNoY);
 
                 // Add table headers with borders
                 pdf.setFontSize(12);
