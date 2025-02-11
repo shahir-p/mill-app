@@ -45,20 +45,26 @@
 
             <div class="billBox">
                 <div class="form-container " id="billForm">
-                    <div class=" inputDiv">
-                        <div >
-                            <label for="customerName" class="form-label">Customer Name :</label>
+                    <div class="inputDiv">
+                        <div>
+                            <label for="customerNameName" class="form-label">Customer Name:</label>
+                            <!-- Input field with datalist for suggestions -->
                             <input type="text" class="form-control input" id="customerNameName"
-                                placeholder="Enter Customer Name" required>
+                                placeholder="Enter Customer Name" list="customerSuggestions" autocomplete="off"
+                                required>
+                            <!-- Datalist for customer name suggestions -->
+                            <datalist id="customerSuggestions"></datalist>
                         </div>
 
-                        <div >
-                            <label for="phoneNumber" class="form-label">Phone Number :</label>
+                        <div>
+                            <label for="phoneNumber" class="form-label">Phone Number:</label>
+                            <!-- Phone number field, editable if no matching customer is selected -->
                             <input type="tel" class="form-control input" id="phoneNumber"
-                                placeholder="Enter Phone Number" maxlength="10" required>
+                                placeholder="Enter or Auto-filled Phone Number" maxlength="10" required>
                         </div>
-
                     </div>
+
+
 
 
                     <div class="inputDiv">
@@ -80,9 +86,9 @@
                         </div>
                     </div>
                     <div class="inputDiv">
-                       
 
-                        <div >
+
+                        <div>
                             <label for="transactionMode" class="form-label">Transaction Mode:</label>
                             <select id="transactionMode" class="form-control input" required>
                                 <option value="cash">Cash</option>
@@ -138,7 +144,7 @@
 
 
             </div>
-            
+
 
             <div class="valuesContainer" id="values">
                 <div class="values">
@@ -190,6 +196,56 @@
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
 
+
+            // Store fetched customers
+            // Store fetched customers
+            let customers = [];
+
+            // Fetch existing customer names and phone numbers
+            async function fetchCustomers() {
+                try {
+                    const billsRef = collection(db, "bills");
+                    const querySnapshot = await getDocs(billsRef);
+                    customers = querySnapshot.docs.map(doc => ({
+                        customerName: doc.data().customerName,
+                        phoneNumber: doc.data().phoneNumber,
+                    }));
+                    console.log("Fetched customers:", customers);
+                } catch (error) {
+                    console.error("Error fetching customers:", error);
+                }
+            }
+
+            // Populate suggestions dynamically
+            document.getElementById("customerNameName").addEventListener("input", function () {
+                const input = this.value.toLowerCase();
+                const suggestions = customers
+                    .filter(c => c.customerName.toLowerCase().includes(input))
+                    .map(c => c.customerName);
+
+                const datalist = document.getElementById("customerSuggestions");
+                datalist.innerHTML = suggestions.map(name => `<option value="${name}">`).join('');
+            });
+
+            // Handle selection or manual entry
+            document.getElementById("customerNameName").addEventListener("change", function () {
+                const selectedName = this.value.trim();
+                const customer = customers.find(c => c.customerName === selectedName);
+
+                if (customer) {
+                    // If customer exists, auto-fill the phone number and disable editing
+                    document.getElementById("phoneNumber").value = customer.phoneNumber;
+                    document.getElementById("phoneNumber").setAttribute("readonly", true);
+                } else {
+                    // If customer doesn't exist, clear phone number and enable manual entry
+                    document.getElementById("phoneNumber").value = "";
+                    document.getElementById("phoneNumber").removeAttribute("readonly");
+                }
+            });
+
+            // Fetch customers when the page loads
+            fetchCustomers();
+
             // Validation and saving logic
             window.validateAndSaveTransaction = async function validateAndSaveTransaction() {
                 try {
@@ -199,26 +255,12 @@
                     const date = document.getElementById("dateField").value.trim();
                     const transactionType = document.getElementById("transactionType").value;
                     const transactionMode = document.getElementById("transactionMode").value;
-                    const initialPayment = document.getElementById("initialPayment").value;
+                    const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
                     const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
-                    
-
-
                     if (!customerName) {
                         showAlert("Customer name is required.", 2500);
-                        return;
-                    }
-
-                    // Check if customer name already exists in Firestore
-                    const billsRef = collection(db, "bills");
-                    const customerQuery = query(billsRef, where("customerName", "==", customerName));
-                    const querySnapshot = await getDocs(customerQuery);
-
-                    if (!querySnapshot.empty) {
-                        // Customer name already exists in Firestore
-                        showAlert("Customer name already exists.", 2500);
                         return;
                     }
 
@@ -242,22 +284,19 @@
                         showAlert("Please add at least one item to the table.", 2500);
                         return;
                     }
+
                     if (initialPayment == totalAmount && transactionType === "credit") {
-                        showAlert("change Transaction Type", 2500)
-                        return
+                        showAlert("Change Transaction Type.", 2500);
+                        return;
                     }
 
-                    // Check each row for completeness (Item Name, Unit Price, Quantity, Amount)
                     for (let i = 0; i < table.rows.length; i++) {
                         const cells = table.rows[i].querySelectorAll("td");
-
-                        // Validate each required field in the row
-                        const itemName = cells[1]?.querySelector('input')?.value.trim();
-                        const unitPrice = parseFloat(cells[2]?.querySelector('input')?.value.trim() || "0");
-                        const quantity = parseInt(cells[3]?.querySelector('input')?.value.trim() || "0");
+                        const itemName = cells[1]?.querySelector("input")?.value.trim();
+                        const unitPrice = parseFloat(cells[2]?.querySelector("input")?.value.trim() || "0");
+                        const quantity = parseInt(cells[3]?.querySelector("input")?.value.trim() || "0");
                         const amount = parseFloat(cells[4]?.textContent.trim() || "0");
 
-                        // Check if fields are empty or invalid
                         if (!itemName) {
                             showAlert(`Please enter Item Name for row ${i + 1}.`, 2500);
                             return;
@@ -276,99 +315,130 @@
                         }
                     }
 
-                    // If all validation passes, proceed with saving the transaction
-                    await window.saveCreditTransaction();
-                     // Call pdfload after saving to Firestore
+                    // Proceed to save or update transaction
+                    await saveOrUpdateTransaction();
                 } catch (error) {
                     console.error("Error during validation and save:", error);
                 }
             };
 
-            window.saveCreditTransaction = async function saveCreditTransaction() {
+            async function saveOrUpdateTransaction() {
                 try {
-                    const billsCollectionRef = collection(db, "bills");
-                    const billsSnapshot = await getDocs(billsCollectionRef);
-
-                    // Collect customer details
+                    const billsRef = collection(db, "bills");
                     const customerName = document.getElementById("customerNameName").value;
                     const phoneNumber = document.getElementById("phoneNumber").value;
                     const date = document.getElementById("dateField").value;
                     const transactionType = document.getElementById("transactionType").value;
                     const transactionMode = document.getElementById("transactionMode").value;
-
-
-                    
-                    // Generate a new invoice number based on the document count
-                    const newInvoiceNo = billsSnapshot.size + 1; // `size` gives the number of documents
-                    const formattedInvoiceNo = `INV-${String(newInvoiceNo).padStart(3, '0')}`; // Format as INV-001, INV-002, etc.
-                    const invoiceNo=formattedInvoiceNo;
-
-                    // Collect table data (items)
-                    const rows = document.querySelectorAll('#itemTable tbody tr');
-                    const items = Array.from(rows).map((row) => {
-                        const cells = row.querySelectorAll('td');
-
-                        // Check if cells contain input fields for item name, unit price, quantity
-                        const itemName = cells[1].querySelector('input') ? cells[1].querySelector('input').value : cells[1].textContent;
-                        const unitPrice = parseFloat(cells[2].querySelector('input') ? cells[2].querySelector('input').value : cells[2].textContent) || 0;
-                        const quantity = parseInt(cells[3].querySelector('input') ? cells[3].querySelector('input').value : cells[3].textContent) || 0;
-                        const amount = parseFloat(cells[4].textContent) || 0; // Amount
-
-                        return {
-                            itemName,
-                            unitPrice,
-                            quantity,
-                            amount
-                        };
-                    });
-
-                    // Collect total, paid amount, and balance amount
-                    const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
                     const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
-
+                    const newTotalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
-                    // Get the local date and time
-                    const currentDateTime = new Date().toLocaleString(); // Local date and time in human-readable format
+                    // Check if customer exists
+                    const customerQuery = query(billsRef, where("customerName", "==", customerName));
+                    const querySnapshot = await getDocs(customerQuery);
 
-                    // Prepare transaction history
-                    const transactionHistory = [
-                        {
-                            paidAmount: initialPayment,
-                            timestamp: currentDateTime ,
-                            transactionMode,
-                        }
-                    ];
+                    if (!querySnapshot.empty) {
+                        // Update existing customer
+                        const docRef = querySnapshot.docs[0].ref;
+                        const existingData = querySnapshot.docs[0].data();
 
-                    // Prepare data for Firestore
-                    const data = {
-                        invoiceNo,
-                        customerName,
-                        phoneNumber,
-                        date,
-                        transactionType,
-                        items,
-                        totalAmount,
-                        initialPayment,
-                        balanceAmount,
-                        transactionHistory // Add the transactionHistory array
-                    };
+                        // Generate a new invoice number for this transaction
+                        const newInvoiceNo = existingData.invoiceNumbers ? existingData.invoiceNumbers.length + 1 : 1;
+                        const formattedInvoiceNo = `INV-${String(newInvoiceNo).padStart(3, "0")}`; // Format as INV-001, etc.
 
-                    // Upload data to Firestore
-                    const docRef = await addDoc(collection(db, "bills"), data);
+                        // Prepare the items for the new invoice
+                        const newItems = Array.from(document.querySelectorAll("#itemTable tbody tr")).map((row) => {
+                            const cells = row.querySelectorAll("td");
+                            return {
+                                itemName: cells[1].querySelector("input").value,
+                                unitPrice: parseFloat(cells[2].querySelector("input").value || "0"),
+                                quantity: parseInt(cells[3].querySelector("input").value || "0"),
+                                amount: parseFloat(cells[4].textContent || "0")
+                            };
+                        });
 
-                    console.log("Transaction saved successfully!");
-                    window.InvoiceNo = invoiceNo;
-                    console.log(InvoiceNo);
-                    
+                        // Add the new invoice to the `invoiceNumbers` array
+                        const updatedInvoiceNumbers = [
+                            ...(existingData.invoiceNumbers || []),
+                            {
+                                invoiceNo: formattedInvoiceNo,
+                                date,
+                                items: newItems
+                            }
+                        ];
+
+                        // Update the transaction history
+                        const updatedTransactionHistory = [
+                            ...existingData.transactionHistory,
+                            {
+                                paidAmount: initialPayment,
+                                timestamp: new Date().toLocaleString(),
+                                transactionMode
+                            }
+                        ];
+
+                        // Update Firestore document
+                        const updatedData = {
+                            ...existingData,
+                            invoiceNumbers: updatedInvoiceNumbers,
+                            totalAmount: existingData.totalAmount + newTotalAmount,
+                            balanceAmount: existingData.balanceAmount + balanceAmount,
+                            transactionHistory: updatedTransactionHistory
+                        };
+
+                        await updateDoc(docRef, updatedData);
+                        console.log("Transaction updated successfully!");
+                    } else {
+                        // Add new customer with a new invoice
+                        const rows = document.querySelectorAll("#itemTable tbody tr");
+                        const invoiceBase = "INV-001";
+
+                        const items = Array.from(rows).map((row) => {
+                            const cells = row.querySelectorAll("td");
+                            return {
+                                itemName: cells[1].querySelector("input").value,
+                                unitPrice: parseFloat(cells[2].querySelector("input").value || "0"),
+                                quantity: parseInt(cells[3].querySelector("input").value || "0"),
+                                amount: parseFloat(cells[4].textContent || "0")
+                            };
+                        });
+
+                        const data = {
+                            customerName,
+                            phoneNumber,
+                            date,
+                            transactionType,
+                            invoiceNumbers: [
+                                {
+                                    invoiceNo: invoiceBase,
+                                    date,
+                                    items
+                                }
+                            ],
+                            totalAmount: newTotalAmount,
+                            balanceAmount,
+                            transactionHistory: [
+                                {
+                                    paidAmount: initialPayment,
+                                    timestamp: new Date().toLocaleString(),
+                                    transactionMode
+                                }
+                            ]
+                        };
+
+                        await addDoc(billsRef, data);
+                        console.log("Transaction saved successfully!");
+                    }
+
                     window.pdfload();
                     location.reload();
-
                 } catch (error) {
-                    console.error("Error saving data: ", error);
+                    console.error("Error saving/updating transaction:", error);
                     alert("Contact Code 114. @ 9526718126");
                 }
-            };
+            }
+
 
             // window.pdfload(); 
         </script>
@@ -411,7 +481,7 @@
                 const pdf = new jsPDF();
                 let y = 20;
 
-                const invoiceNo =( window.InvoiceNo);
+                const invoiceNo = (window.InvoiceNo);
 
                 pdf.setFontSize(20);
                 pdf.setFont("helvetica", "bold");
@@ -603,7 +673,7 @@
 
                 // Save PDF
                 pdf.save('bill.pdf');
-               
+
             };
 
         </script>
@@ -777,10 +847,10 @@
             };
 
 
-            
-                    const initialPayment = document.getElementById("initialPayment").value;
-                    const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
-                    const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
+
+            const initialPayment = document.getElementById("initialPayment").value;
+            const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
+            const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
             // Calculate total amount
             // Prevent initialPayment from changing on row add/delete
@@ -805,14 +875,14 @@
                 const initialPaymentInput = document.getElementById('initialPayment');
                 const totalAmount = parseFloat(document.getElementById("total").textContent || "0");
                 // console.log(credtotal);
-                
+
 
                 if (transactionType === "Full Payment") {
 
                     document.getElementById("balanceAmount").textContent = "0";
-                    initialPaymentInput.value=totalAmount
+                    initialPaymentInput.value = totalAmount
                 } else {
-                    initialPaymentInput.value="0"
+                    initialPaymentInput.value = "0"
                     updateBalance(); // Only update balance; do not modify initialPayment
                 }
             }
@@ -867,7 +937,7 @@
             const updateBalance = () => {
                 const totalAmount = parseFloat(document.getElementById('total').textContent) || 0;
                 console.log(totalAmount);
-                
+
                 const initialPayment = parseFloat(initialPaymentInput.value) || 0;
                 const balance = totalAmount - initialPayment;
                 balanceAmountSpan.textContent = balance.toFixed(0);
