@@ -1,37 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice Details</title>
+    <title>Invoice A4 Canvas</title>
+    <link rel="stylesheet" href="./invoice.css">
 </head>
+
 <body>
-    <h1>Invoice Details</h1>
-    <p>Invoice Number: <span id="invoiceNumber"></span></p>
+    <div class="a4-canvas">
+        <div class="a4show">
+            <div class="header">
+
+                <div class="companyDetails">
+                    <span class="heading">Company Name</span>
+                    <span class="subhead">Address</span>
+                    <span class="subhead">Phone</span>
+                </div>
+                <h1>INVOICE</h1>
+                <!-- <p>Company Name <span id="invoiceNO"></span></p>
+            <p>Date: <span id="invoiceDate"></span></p>
+            <p>Total Amount: <span id="totalAmount"></span></p>
+            <p>Balance Amount: <span id="balanceAmount"></span></p> -->
+            </div>
+            <div class="customerDetails">
+                <div class="cd1">
+                    <span class="cheading">To</span>
+                    <span class="csubhead">Address</span>
+                    <span class="csubhead">Phone</span>
+                </div>
+                <div class="cd1">
+
+                    <span class="csubhead">00-00-0000</span>
+                    <span class="csubhead"># invoice</span>
+
+                </div>
+            </div>
+            <div class="table">
+                <table>
+                    <thead>
+                        <tr>
+                        <th class="sn">S/N</th>
+                        <th class="items">Items</th>
+                        <th class="qty">QTY</th>
+                        <th class="price">Price</th>
+                        <th class="Amount">Amount</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+
+        </div>
+    </div>
 </body>
 <script type="module">
-    // Extract the invoice number from the URL
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getFirestore, collection, doc, getDocs } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBZ_mkqt1dB2_uLRGamOxxjcOjgxntL8gY",
+        authDomain: "mill-karathur-6756d.firebaseapp.com",
+        projectId: "mill-karathur-6756d",
+        storageBucket: "mill-karathur-6756d.appspot.com",
+        messagingSenderId: "304225841532",
+        appId: "1:304225841532:web:c09b203608227e991bb4f9",
+        measurementId: "G-VRXZKDPYPX",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Get invoiceNo from the URL
     const urlParams = new URLSearchParams(window.location.search);
-    const invoiceNo = urlParams.get('invoiceNo');
+    const invoiceNo = urlParams.get('invoiceNo'); // Get invoice number from query parameter
 
-    // Display the invoice number on the page
-    document.getElementById("invoiceNumber").textContent = invoiceNo;
+    document.getElementById("invoiceNO").textContent = invoiceNo;
 
-    // Fetch and display additional details if needed
-    async function fetchInvoiceDetails(invoiceNo) {
+
+
+    async function searchInvoiceInAllDocs(invoiceNo) {
         try {
-            // Add your Firebase fetch logic here if needed to retrieve additional invoice details
-            console.log(`Fetching details for invoice: ${invoiceNo}`);
+            const billsCollection = collection(db, "bills"); // Access the "bills" collection
+            const querySnapshot = await getDocs(billsCollection);
+
+            let matchingTransactions = [];
+            let matchingInvoices = [];
+
+            querySnapshot.forEach(docSnap => {
+                const docId = docSnap.id; // Auto-generated document ID
+                const data = docSnap.data();
+                const transactionHistory = data.transactionHistory || [];
+                const invoiceNumbers = data.invoiceNumbers || [];
+
+                // Find matches in both arrays
+                const matchedTransaction = transactionHistory.find(item => item.invoiceNo === invoiceNo);
+                const matchedInvoice = invoiceNumbers.find(item => item.invoiceNo === invoiceNo);
+
+                // Collect results
+                if (matchedTransaction) {
+                    matchingTransactions.push({
+                        docId, // Include the document ID
+                        ...matchedTransaction
+                    });
+                }
+                if (matchedInvoice) {
+                    matchingInvoices.push({
+
+                        docId, // Include the document ID
+                        ...matchedInvoice
+                    });
+                }
+            });
+
+            // Log results
+            console.log("Matching Transactions:", matchingTransactions);
+            console.log("Matching Invoices:", matchingInvoices);
+
+            if (matchingInvoices.length > 0) {
+                const invoiceDateElement = document.getElementById("invoiceDate");
+                if (invoiceDateElement) {
+                    invoiceDateElement.textContent = matchingInvoices[0].date || "Date not found";
+                } else {
+                    console.error("Element with id 'invoiceDate' not found in the DOM.");
+                }
+            } else {
+                console.log("No matching invoices found.");
+            }
         } catch (error) {
-            console.error("Error fetching invoice details:", error);
+            console.error("Error searching invoice:", error);
         }
     }
 
-    // Fetch details if needed
-    if (invoiceNo) {
-        fetchInvoiceDetails(invoiceNo);
-    } else {
-        console.error("No invoice number provided.");
-    }
+    // Replace "INV-002" with the invoice number you want to search for
+    searchInvoiceInAllDocs(invoiceNo);
 </script>
+
 </html>

@@ -368,9 +368,7 @@
             <td>${index + 1}</td>
             <td>${invoiceDate}</td>
             <td>${invoiceNo}</td>
-            <td>
-  <button class="btn btn-primary btn-sm" onclick="viewInvoiceDetails('INV-002')">View</button>
-</td>
+             <td><button class="btn btn-primary btn-sm view-button" data-invoice-no="${invoiceNo}">View</button></td>
 
         `;
                 productTableBody.appendChild(row);
@@ -487,11 +485,12 @@
             }
         });
 
-        window.viewInvoiceDetails = function (invoiceNo) {
-            console.log(`Button clicked for invoice: ${invoiceNo}`);
-            window.location.href = `invoice.html?invoiceNo=${encodeURIComponent(invoiceNo)}`;
-        };
-
+        document.querySelector("table").addEventListener("click", event => {
+            if (event.target.classList.contains("view-button")) {
+                const invoiceNo = event.target.getAttribute("data-invoice-no");
+                window.location.href = `invoice.html?invoiceNo=${invoiceNo}`;
+            }
+        });
 
 
 

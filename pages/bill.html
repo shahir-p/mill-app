@@ -326,6 +326,9 @@
                                 paidAmount: initialPayment,
                                 timestamp: new Date().toLocaleString(),
                                 transactionMode,
+                                invoiceNo: newInvoiceNo,
+                                totalAmount,
+                                balanceAmount,
                             },
                         ];
 
@@ -349,6 +352,11 @@
                                 paidAmount: initialPayment,
                                 timestamp: new Date().toLocaleString(),
                                 transactionMode,
+                                invoiceNo: newInvoiceNo,
+                                totalAmount,
+                                balanceAmount,
+                                customerName,
+                                phoneNumber,
                             },
                         ];
 
@@ -925,6 +933,10 @@
                 updateBalance(); // Update the balance after validation
             });
 
+
+            navigate.addEventListener("click", () => {
+            window.history.back();
+        });
 
 
 
