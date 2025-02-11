@@ -57,6 +57,7 @@
             line-height: 1.5;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
         .modal {
@@ -367,23 +368,22 @@
             <td>${index + 1}</td>
             <td>${invoiceDate}</td>
             <td>${invoiceNo}</td>
-            <td><button class="btn btn-primary btn-sm" onclick="viewInvoiceDetails('${invoiceNo}')">View</button></td>
+            <td>
+  <button class="btn btn-primary btn-sm" onclick="viewInvoiceDetails('INV-002')">View</button>
+</td>
+
         `;
                 productTableBody.appendChild(row);
             });
         }
 
-        function viewInvoiceDetails(invoiceNo) {
-            alert(`Viewing details for invoice: ${invoiceNo}`);
-            // Add logic to fetch and display details for the selected invoice
-        }
 
 
 
 
 
         // Function to show/hide the Pay/Delete buttons
-       
+
 
 
         function displayPaymentHistory(transactionHistory) {
@@ -486,6 +486,12 @@
                 alert("Error updating payment, contact Code114. @ 9526718126");
             }
         });
+
+        window.viewInvoiceDetails = function (invoiceNo) {
+            console.log(`Button clicked for invoice: ${invoiceNo}`);
+            window.location.href = `invoice.html?invoiceNo=${encodeURIComponent(invoiceNo)}`;
+        };
+
 
 
 
