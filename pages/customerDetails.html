@@ -82,7 +82,7 @@
             padding: 8px;
             border-radius: 10px;
         }
-        .initialPayment{
+        .totalPaid{
             background-color: rgb(69, 171, 239);
             color: white;
             padding: 8px;
@@ -168,7 +168,7 @@
           <div class="colorBox">
                
                 <h5 class="mt-2 totalAmount">Total Amount : <span id="totalAmount">Loading...</span></h5>
-                <h5 class="mt-2 initialPayment">Paid Amount : <span id="initialPayment">Loading...</span></h5>
+                <h5 class="mt-2 totalPaid">Paid Amount : <span id="totalPaid">Loading...</span></h5>
                 <h5 class="mt-2 balanceAmount">Balance Amount : <span id="balanceAmount">Loading...</span></h5>
           </div>
 
@@ -299,16 +299,16 @@
                     console.log("Customer Data:", customerData);
                     console.log("Transaction History:", customerData.transactionHistory);
 
-                    const initialPayment = customerData.initialPayment || 0;
+                    const totalPaid = customerData.totalPaid || 0;
                     const totalAmount = customerData.totalAmount || 0;
-                    currentBalance = customerData.balanceAmount || totalAmount - initialPayment;
+                    currentBalance = customerData.balanceAmount || totalAmount - totalPaid;
                     const numberPhone = customerData.phoneNumber;
                     const Date = customerData.date;
                     const transaction = customerData.transactionType;
                     const InvoiceNo =customerData.invoiceNo;
 
 
-                    document.getElementById("initialPayment").textContent = initialPayment;
+                    document.getElementById("totalPaid").textContent = totalPaid;
                     document.getElementById("totalAmount").textContent = totalAmount;
                     document.getElementById("balanceAmount").textContent = currentBalance;
                     document.getElementById("phoneNumber").textContent = numberPhone;
@@ -432,10 +432,11 @@
 
             try {
                 const customerRef = doc(db, "bills", customerDocId);
-                const currentPaid = parseFloat(document.getElementById("initialPayment").textContent);
+                const currentPaid = parseFloat(document.getElementById("totalPaid").textContent);
 
                 const newPaid = currentPaid + paymentAmount;
                 const newBalance = currentBalance - paymentAmount;
+                
 
                 // Prepare the new transaction entry
                 const transactionEntry = {
@@ -444,9 +445,9 @@
                     transactionMode: transactionMode, // Correct reference
                 };
 
-                // Update Firestore document: add to transactionHistory, update initialPayment and balanceAmount
+                // Update Firestore document: add to transactionHistory, update totalPaid and balanceAmount
                 await updateDoc(customerRef, {
-                    initialPayment: newPaid,
+                    totalPaid: newPaid,
                     balanceAmount: newBalance,
                     transactionHistory: arrayUnion(transactionEntry), // Use arrayUnion from Firestore
                 });
