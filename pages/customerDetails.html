@@ -63,70 +63,81 @@
             overflow-y: visible !important;
             /* Ensure dropdown options are not clipped */
         }
-        .payButton:hover{
+
+        .payButton:hover {
             background-color: rgb(59, 135, 59);
 
         }
-        .tableOuter{
+
+        .tableOuter {
             border: 1px solid black;
             border-radius: 20px;
             width: 49%;
             column-gap: 20px;
         }
-        thead tr th{
+
+        thead tr th {
             font-weight: 600;
         }
-        .totalAmount{
+
+        .totalAmount {
             background-color: black;
             color: white;
             padding: 8px;
             border-radius: 10px;
         }
-        .totalPaid{
+
+        .totalPaid {
             background-color: rgb(69, 171, 239);
             color: white;
             padding: 8px;
             border-radius: 10px;
         }
-        .balanceAmount{
-            background-color:rgb(241, 49, 49);
+
+        .balanceAmount {
+            background-color: rgb(241, 49, 49);
             padding: 8px;
             border-radius: 10px;
             color: white;
         }
-        .gridBox{
+
+        .gridBox {
             display: flex;
             justify-content: space-around;
             width: 100%;
         }
+
         @media (max-width: 992px) {
             .properties {
-            line-height: 1.5;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+                line-height: 1.5;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .gridBox {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                width: 100%;
+            }
+
+            .tableOuter {
+                border: 1px solid black;
+                border-radius: 20px;
+                width: 100%;
+            }
+
+            .colorBox {
+                text-align: center;
+            }
         }
-            .gridBox{
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            width: 100%;
-        }
-        .tableOuter{
-            border: 1px solid black;
-            border-radius: 20px;
-            width: 100%;
-        }
-        .colorBox{
-            text-align: center;
-        }
-        }
+
         @media (max-width: 460px) {
-            thead tr th{
-            font-weight: 500;
+            thead tr th {
+                font-weight: 500;
+            }
         }
-        }
-        
     </style>
 </head>
 
@@ -160,17 +171,16 @@
         <div class="properties">
             <div>
                 <h4 class="mt-2">Name: <span id="customerName">Loading...</span></h4>
-                <h5 class="mt-2">Invoice No : <span id="InvoiceNo">Loading...</span></h5>
+
                 <h5 class="mt-">Phone Number : <span id="phoneNumber">Loading...</span></h5>
-                <h5 class="mt-">Date of purchase : <span id="date">Loading...</span></h5>
-                <h5 class="mt-2">Transaction Type: <span id="TransactionType">Loading...</span></h5>
+
             </div>
-          <div class="colorBox">
-               
+            <div class="colorBox">
+
                 <h5 class="mt-2 totalAmount">Total Amount : <span id="totalAmount">Loading...</span></h5>
                 <h5 class="mt-2 totalPaid">Paid Amount : <span id="totalPaid">Loading...</span></h5>
                 <h5 class="mt-2 balanceAmount">Balance Amount : <span id="balanceAmount">Loading...</span></h5>
-          </div>
+            </div>
 
 
 
@@ -183,10 +193,10 @@
                     <thead>
                         <tr>
                             <th>S/N</th>
-                            <th>Product</th>
-                            <th>Unit Price</th>
-                            <th>Quantity</th>
-                            <th>amount</th>
+                            <th>Date</th>
+                            <th>Invoice No</th>
+                            <th></th>
+
                         </tr>
                     </thead>
                     <tbody id="productTableBody">
@@ -195,7 +205,7 @@
                 </table>
             </div>
 
-            <div  id="history" class=" tableOuter  mt-2 p-2 ">
+            <div id="history" class=" tableOuter  mt-2 p-2 ">
                 <h5 class="">Payment History :</h5>
                 <table class="table table-bordered border  mt-4">
                     <thead>
@@ -284,6 +294,8 @@
         let customerDocId = null;
         let currentBalance = 0;
 
+        let customerData = null; // Declare a global variable to store customer data
+
         async function fetchCustomerDetails() {
             try {
                 const customerRef = collection(db, "bills");
@@ -293,46 +305,40 @@
                 if (!querySnapshot.empty) {
                     const customerDoc = querySnapshot.docs[0];
                     customerDocId = customerDoc.id;
-                    const customerData = customerDoc.data();
+                    customerData = customerDoc.data(); // Assign data to the global variable
 
-                    // Log the full customer data and transaction history for inspection
-                    console.log("Customer Data:", customerData);
-                    console.log("Transaction History:", customerData.transactionHistory);
+                    // Log the customer data
+                    console.log("Customer Data:", customerData.transactionHistory);
+                    const transactionHistory = customerData.transactionHistory || [];
 
                     const totalPaid = customerData.totalPaid || 0;
                     const totalAmount = customerData.totalAmount || 0;
                     currentBalance = customerData.balanceAmount || totalAmount - totalPaid;
                     const numberPhone = customerData.phoneNumber;
-                    const Date = customerData.date;
-                    const transaction = customerData.transactionType;
-                    const InvoiceNo =customerData.invoiceNo;
-
 
                     document.getElementById("totalPaid").textContent = totalPaid;
                     document.getElementById("totalAmount").textContent = totalAmount;
                     document.getElementById("balanceAmount").textContent = currentBalance;
                     document.getElementById("phoneNumber").textContent = numberPhone;
-                    document.getElementById("TransactionType").textContent = transaction;
-                    document.getElementById("date").textContent = Date;
-                    document.getElementById("InvoiceNo").textContent = InvoiceNo;
 
                     const payButton = document.getElementById('payButton');
-
                     if (currentBalance === 0) {
-                        payButton.style.display = "none"
+                        payButton.style.display = "none";
                     }
 
-                    // Show/Hide the Pay/Delete buttons based on balance amount
-
-
-                    displayProducts(customerData.items || []);
-
-                    // Check if transactionHistory exists and display
+                    // Display invoices instead of products
+                    if (customerData.invoiceNumbers && customerData.invoiceNumbers.length > 0) {
+                        displayInvoices(customerData.invoiceNumbers);
+                    } else {
+                        console.log("No invoices found.");
+                        document.getElementById("productTableBody").innerHTML = "<tr><td colspan='4'>No invoices found</td></tr>";
+                    }
+                    // Call displayPaymentHistory here
                     if (customerData.transactionHistory && customerData.transactionHistory.length > 0) {
                         displayPaymentHistory(customerData.transactionHistory);
                     } else {
                         console.log("No transaction history available.");
-                        document.getElementById("paymentHistoryTableBody").innerHTML = "<tr><td colspan='4'>No payment history found</td></tr>";
+                        document.getElementById("paymentHistoryTableBody").innerHTML = "<tr><td colspan='5'>No payment history found</td></tr>";
                     }
 
                 } else {
@@ -343,74 +349,95 @@
             }
         }
 
-        // Function to show/hide the Pay/Delete buttons
+        function displayInvoices(invoiceNumbers) {
+            const productTableBody = document.getElementById("productTableBody");
+            productTableBody.innerHTML = "";
 
-        function displayPaymentHistory(transactionHistory) {
-            const paymentHistoryTableBody = document.getElementById("paymentHistoryTableBody");
-            paymentHistoryTableBody.innerHTML = "";
-
-            if (transactionHistory.length === 0) {
-                paymentHistoryTableBody.innerHTML = "<tr><td colspan='5'>No payment history found</td></tr>";
+            if (!invoiceNumbers || invoiceNumbers.length === 0) {
+                productTableBody.innerHTML = "<tr><td colspan='4'>No invoices found</td></tr>";
                 return;
             }
 
-            let totalAmount = currentBalance; // Initialize totalAmount from the current balance or the customer data
+            invoiceNumbers.forEach((invoice, index) => {
+                const row = document.createElement("tr");
+                const invoiceDate = invoice.date || "N/A"; // "11-02-2025" format string
+                const invoiceNo = invoice.invoiceNo || "N/A"; // "INV-002" format string
+
+                row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${invoiceDate}</td>
+            <td>${invoiceNo}</td>
+            <td><button class="btn btn-primary btn-sm" onclick="viewInvoiceDetails('${invoiceNo}')">View</button></td>
+        `;
+                productTableBody.appendChild(row);
+            });
+        }
+
+        function viewInvoiceDetails(invoiceNo) {
+            alert(`Viewing details for invoice: ${invoiceNo}`);
+            // Add logic to fetch and display details for the selected invoice
+        }
+
+
+
+
+
+        // Function to show/hide the Pay/Delete buttons
+       
+
+
+        function displayPaymentHistory(transactionHistory) {
+            const paymentHistoryTableBody = document.getElementById("paymentHistoryTableBody");
+            paymentHistoryTableBody.innerHTML = ""; // Clear the table body
+
+            if (!transactionHistory || transactionHistory.length === 0) {
+                // If no transaction history is found
+                paymentHistoryTableBody.innerHTML = "<tr><td colspan='5'>No payment history found</td></tr>";
+                console.log("Transaction history is empty or undefined.");
+                return;
+            }
+
+            console.log("Transaction History:", transactionHistory);
 
             transactionHistory.forEach((transaction, index) => {
                 const row = document.createElement("tr");
 
                 // Parse the string timestamp into a Date object
-                const timestampString = transaction.timestamp;
-                const timestamp = new Date(timestampString);
+                try {
+                    const timestampString = transaction.timestamp;
+                    const timestamp = new Date(timestampString);
 
-                // Format the date manually to ensure consistency
-                const day = String(timestamp.getDate()).padStart(2, '0'); // Get day (2 digits)
-                const month = String(timestamp.getMonth() + 1).padStart(2, '0'); // Get month (2 digits)
-                const year = timestamp.getFullYear(); // Get full year
-                const date = `${day}/${month}/${year}`; // Format in dd/mm/yyyy
+                    if (isNaN(timestamp)) {
+                        throw new Error("Invalid timestamp format");
+                    }
 
-                // Format the time
-                const time = timestamp.toLocaleTimeString();
+                    // Format the date manually to ensure consistency
+                    const day = String(timestamp.getDate()).padStart(2, '0'); // Get day (2 digits)
+                    const month = String(timestamp.getMonth() + 1).padStart(2, '0'); // Get month (2 digits)
+                    const year = timestamp.getFullYear(); // Get full year
+                    const date = `${day}/${month}/${year}`; // Format in dd/mm/yyyy
 
-                // Add the row data
-                row.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${date}</td>
-            <td>${time}</td>
-            <td>${transaction.paidAmount}</td>
-            <td>${transaction.transactionMode}</td>
-        `;
+                    // Format the time
+                    const time = timestamp.toLocaleTimeString();
 
-                // Add the row to the table
-                paymentHistoryTableBody.appendChild(row);
+                    // Add the row data
+                    row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${date}</td>
+                <td>${time}</td>
+                <td>${transaction.paidAmount}</td>
+                <td>${transaction.transactionMode}</td>
+            `;
 
-                // Update the totalAmount for the next iteration (running balance)
-                totalAmount -= transaction.paidAmount;
+                    paymentHistoryTableBody.appendChild(row);
+                } catch (error) {
+                    console.error("Error parsing timestamp:", transaction.timestamp, error);
+                }
             });
         }
 
 
-        function displayProducts(items) {
-            const productTableBody = document.getElementById("productTableBody");
-            productTableBody.innerHTML = "";
 
-            if (items.length === 0) {
-                productTableBody.innerHTML = "<tr><td colspan='4'>No products found</td></tr>";
-                return;
-            }
-
-            items.forEach((item, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.itemName}</td>
-                    <td>${item.unitPrice}</td>
-                    <td>${item.quantity}</td>
-                    <td>${item.amount}</td>`
-                    ;
-                productTableBody.appendChild(row);
-            });
-        }
 
         document.getElementById("payButton").addEventListener("click", () => {
             document.getElementById("modalBalanceAmount").textContent = currentBalance;
@@ -436,7 +463,7 @@
 
                 const newPaid = currentPaid + paymentAmount;
                 const newBalance = currentBalance - paymentAmount;
-                
+
 
                 // Prepare the new transaction entry
                 const transactionEntry = {
@@ -478,7 +505,7 @@
         navigate.addEventListener("click", () => {
             window.history.back();
         });
-    
+
     </script>
 
 </body>
