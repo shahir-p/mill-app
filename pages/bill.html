@@ -179,7 +179,17 @@
         <script type="module">
             // Firebase imports
             import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-            import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
+            import {
+                getFirestore,
+                collection,
+                addDoc,
+                query,
+                where,
+                getDocs,
+                updateDoc,
+                doc,
+                increment,
+            } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-firestore.js";
 
             // Firebase configuration
             const firebaseConfig = {
@@ -196,17 +206,13 @@
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
 
-
-            // Store fetched customers
-            // Store fetched customers
             let customers = [];
 
-            // Fetch existing customer names and phone numbers
             async function fetchCustomers() {
                 try {
                     const billsRef = collection(db, "bills");
                     const querySnapshot = await getDocs(billsRef);
-                    customers = querySnapshot.docs.map(doc => ({
+                    customers = querySnapshot.docs.map((doc) => ({
                         customerName: doc.data().customerName,
                         phoneNumber: doc.data().phoneNumber,
                     }));
@@ -216,9 +222,23 @@
                 }
             }
 
-            // Populate suggestions dynamically
             document.getElementById("customerNameName").addEventListener("input", function () {
-                const input = this.value.toLowerCase();
+                const input = this.value.trim().toLowerCase();
+
+                // Find a matching customer
+                const customer = customers.find(c => c.customerName.toLowerCase() === input);
+
+                if (customer) {
+                    // Auto-fill the phone number if a match is found
+                    document.getElementById("phoneNumber").value = customer.phoneNumber;
+                    document.getElementById("phoneNumber").setAttribute("readonly", true);
+                } else {
+                    // Clear phone number field if no match
+                    document.getElementById("phoneNumber").value = "";
+                    document.getElementById("phoneNumber").removeAttribute("readonly");
+                }
+
+                // Populate the suggestions list
                 const suggestions = customers
                     .filter(c => c.customerName.toLowerCase().includes(input))
                     .map(c => c.customerName);
@@ -227,29 +247,12 @@
                 datalist.innerHTML = suggestions.map(name => `<option value="${name}">`).join('');
             });
 
-            // Handle selection or manual entry
-            document.getElementById("customerNameName").addEventListener("change", function () {
-                const selectedName = this.value.trim();
-                const customer = customers.find(c => c.customerName === selectedName);
 
-                if (customer) {
-                    // If customer exists, auto-fill the phone number and disable editing
-                    document.getElementById("phoneNumber").value = customer.phoneNumber;
-                    document.getElementById("phoneNumber").setAttribute("readonly", true);
-                } else {
-                    // If customer doesn't exist, clear phone number and enable manual entry
-                    document.getElementById("phoneNumber").value = "";
-                    document.getElementById("phoneNumber").removeAttribute("readonly");
-                }
-            });
 
-            // Fetch customers when the page loads
             fetchCustomers();
 
-            // Validation and saving logic
             window.validateAndSaveTransaction = async function validateAndSaveTransaction() {
                 try {
-                    // Perform validation
                     const customerName = document.getElementById("customerNameName").value.trim();
                     const phoneNumber = document.getElementById("phoneNumber").value.trim();
                     const date = document.getElementById("dateField").value.trim();
@@ -259,213 +262,162 @@
                     const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
-                    if (!customerName) {
-                        showAlert("Customer name is required.", 2500);
-                        return;
-                    }
-
-                    if (!phoneNumber || isNaN(phoneNumber) || phoneNumber.length !== 10) {
-                        showAlert("Please enter a valid 10-digit phone number.", 2500);
-                        return;
-                    }
-
-                    if (!date) {
-                        showAlert("Please select a date.", 2500);
-                        return;
-                    }
-
-                    if (!transactionType) {
-                        showAlert("Please select a transaction type.", 2500);
+                    if (!customerName || !phoneNumber || !date || !transactionType) {
+                        showAlert("All fields are required.", 2500);
                         return;
                     }
 
                     const table = document.getElementById("itemTable").querySelector("tbody");
                     if (!table || table.rows.length === 0) {
-                        showAlert("Please add at least one item to the table.", 2500);
+                        showAlert("Add at least one item.", 2500);
                         return;
                     }
 
-                    if (initialPayment == totalAmount && transactionType === "credit") {
-                        showAlert("Change Transaction Type.", 2500);
-                        return;
-                    }
-
-                    for (let i = 0; i < table.rows.length; i++) {
-                        const cells = table.rows[i].querySelectorAll("td");
-                        const itemName = cells[1]?.querySelector("input")?.value.trim();
-                        const unitPrice = parseFloat(cells[2]?.querySelector("input")?.value.trim() || "0");
-                        const quantity = parseInt(cells[3]?.querySelector("input")?.value.trim() || "0");
-                        const amount = parseFloat(cells[4]?.textContent.trim() || "0");
-
-                        if (!itemName) {
-                            showAlert(`Please enter Item Name for row ${i + 1}.`, 2500);
-                            return;
-                        }
-                        if (isNaN(unitPrice) || unitPrice <= 0) {
-                            showAlert(`Please enter a valid Unit Price for row ${i + 1}.`, 2500);
-                            return;
-                        }
-                        if (isNaN(quantity) || quantity <= 0) {
-                            showAlert(`Please enter a valid Quantity for row ${i + 1}.`, 2500);
-                            return;
-                        }
-                        if (isNaN(amount) || amount <= 0) {
-                            showAlert(`Please enter a valid Amount for row ${i + 1}.`, 2500);
-                            return;
-                        }
-                    }
-
-                    // Proceed to save or update transaction
-                    await saveOrUpdateTransaction();
+                    await saveOrUpdateTransaction(customerName, phoneNumber, date, transactionType, transactionMode, initialPayment, totalAmount, balanceAmount);
                 } catch (error) {
                     console.error("Error during validation and save:", error);
                 }
             };
 
-            async function saveOrUpdateTransaction() {
+            async function saveOrUpdateTransaction(customerName, phoneNumber, date, transactionType, transactionMode, initialPayment, totalAmount, balanceAmount) {
                 try {
                     const billsRef = collection(db, "bills");
-                    const customerName = document.getElementById("customerNameName").value;
-                    const phoneNumber = document.getElementById("phoneNumber").value;
-                    const date = document.getElementById("dateField").value;
-                    const transactionType = document.getElementById("transactionType").value;
-                    const transactionMode = document.getElementById("transactionMode").value;
-                    const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
-                    const newTotalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
-                    const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
-
-                    // Check if customer exists
                     const customerQuery = query(billsRef, where("customerName", "==", customerName));
                     const querySnapshot = await getDocs(customerQuery);
 
+                    // Generate a unique invoice number
+                    const generateUniqueInvoiceNo = async () => {
+                        const allDocs = await getDocs(billsRef);
+                        const allInvoices = allDocs.docs.flatMap((doc) => doc.data().invoiceNumbers || []);
+                        return `INV-${String(allInvoices.length + 1).padStart(3, "0")}`;
+                    };
+
+                    const newInvoiceNo = await generateUniqueInvoiceNo();
+
+                    // Collect items from the table
+                    const newItems = Array.from(document.querySelectorAll("#itemTable tbody tr")).map((row) => {
+                        const cells = row.querySelectorAll("td");
+                        return {
+                            itemName: cells[1].querySelector("input").value,
+                            unitPrice: parseFloat(cells[2].querySelector("input").value || "0"),
+                            quantity: parseInt(cells[3].querySelector("input").value || "0"),
+                            amount: parseFloat(cells[4].textContent || "0"),
+                        };
+                    });
+
                     if (!querySnapshot.empty) {
-                        // Update existing customer
+                        // Update existing customer record
                         const docRef = querySnapshot.docs[0].ref;
                         const existingData = querySnapshot.docs[0].data();
 
-                        // Generate a new invoice number for this transaction
-                        const newInvoiceNo = existingData.invoiceNumbers ? existingData.invoiceNumbers.length + 1 : 1;
-                        const formattedInvoiceNo = `INV-${String(newInvoiceNo).padStart(3, "0")}`; // Format as INV-001, etc.
-
-                        // Prepare the items for the new invoice
-                        const newItems = Array.from(document.querySelectorAll("#itemTable tbody tr")).map((row) => {
-                            const cells = row.querySelectorAll("td");
-                            return {
-                                itemName: cells[1].querySelector("input").value,
-                                unitPrice: parseFloat(cells[2].querySelector("input").value || "0"),
-                                quantity: parseInt(cells[3].querySelector("input").value || "0"),
-                                amount: parseFloat(cells[4].textContent || "0")
-                            };
-                        });
-
-                        // Add the new invoice to the `invoiceNumbers` array
                         const updatedInvoiceNumbers = [
                             ...(existingData.invoiceNumbers || []),
                             {
-                                invoiceNo: formattedInvoiceNo,
+                                invoiceNo: newInvoiceNo,
+                                transactionType,
                                 date,
-                                items: newItems
-                            }
+                                items: newItems,
+                            },
                         ];
 
-                        // Update the transaction history
                         const updatedTransactionHistory = [
-                            ...existingData.transactionHistory,
+                            ...(existingData.transactionHistory || []),
                             {
                                 paidAmount: initialPayment,
                                 timestamp: new Date().toLocaleString(),
-                                transactionMode
-                            }
+                                transactionMode,
+                            },
                         ];
 
-                        // Update Firestore document
+                        const totalPaid = updatedTransactionHistory.reduce((sum, transaction) => sum + parseFloat(transaction.paidAmount || 0), 0);
+
                         const updatedData = {
                             ...existingData,
                             invoiceNumbers: updatedInvoiceNumbers,
-                            totalAmount: existingData.totalAmount + newTotalAmount,
-                            balanceAmount: existingData.balanceAmount + balanceAmount,
-                            transactionHistory: updatedTransactionHistory
+                            totalAmount: (existingData.totalAmount || 0) + totalAmount,
+                            balanceAmount: (existingData.balanceAmount || 0) + balanceAmount,
+                            transactionHistory: updatedTransactionHistory,
+                            totalPaid, // Add the totalPaid key
                         };
 
                         await updateDoc(docRef, updatedData);
-                        console.log("Transaction updated successfully!");
+                        showAlert("Transaction updated successfully!", 3000);
                     } else {
-                        // Add new customer with a new invoice
-                        const rows = document.querySelectorAll("#itemTable tbody tr");
-                        const invoiceBase = "INV-001";
+                        // Add a new customer record
+                        const transactionHistory = [
+                            {
+                                paidAmount: initialPayment,
+                                timestamp: new Date().toLocaleString(),
+                                transactionMode,
+                            },
+                        ];
 
-                        const items = Array.from(rows).map((row) => {
-                            const cells = row.querySelectorAll("td");
-                            return {
-                                itemName: cells[1].querySelector("input").value,
-                                unitPrice: parseFloat(cells[2].querySelector("input").value || "0"),
-                                quantity: parseInt(cells[3].querySelector("input").value || "0"),
-                                amount: parseFloat(cells[4].textContent || "0")
-                            };
-                        });
+                        const totalPaid = transactionHistory.reduce((sum, transaction) => sum + parseFloat(transaction.paidAmount || 0), 0);
 
                         const data = {
                             customerName,
                             phoneNumber,
-                            date,
-                            transactionType,
                             invoiceNumbers: [
                                 {
-                                    invoiceNo: invoiceBase,
+                                    invoiceNo: newInvoiceNo,
+                                    transactionType,
                                     date,
-                                    items
-                                }
+                                    items: newItems,
+                                },
                             ],
-                            totalAmount: newTotalAmount,
+                            totalAmount,
                             balanceAmount,
-                            transactionHistory: [
-                                {
-                                    paidAmount: initialPayment,
-                                    timestamp: new Date().toLocaleString(),
-                                    transactionMode
-                                }
-                            ]
+                            transactionHistory,
+                            totalPaid, // Add the totalPaid key
                         };
 
                         await addDoc(billsRef, data);
-                        console.log("Transaction saved successfully!");
+                        showAlert("Transaction saved successfully!", 3000);
                     }
 
                     window.pdfload();
                     location.reload();
                 } catch (error) {
                     console.error("Error saving/updating transaction:", error);
-                    alert("Contact Code 114. @ 9526718126");
+                    showAlert("Error! Please contact support.", 5000);
                 }
             }
 
-
-            // window.pdfload(); 
-        </script>
-
-        <script>
+            // Show custom alert messages
             const showAlert = (message, duration = 3000) => {
                 const alertBox = document.getElementById("customAlert");
                 alertBox.textContent = message;
                 alertBox.style.display = "block";
-
-                // Hide the alert after the specified duration
                 setTimeout(() => {
                     alertBox.style.display = "none";
                 }, duration);
             };
-            const navigate = document.getElementById("navigate");
-            navigate.addEventListener("click", () => {
-                window.location.href = './homePage.html';  // This will navigate to the homepage
-            });
 
-            // Attach the validation and saving logic to the save button
+            // Validate input fields and call saveOrUpdateTransaction
+            const validateAndSaveTransaction = () => {
+                const customerName = document.getElementById("customerNameName").value.trim();
+                const phoneNumber = document.getElementById("phoneNumber").value.trim();
+                const date = document.getElementById("dateField").value.trim();
+                const transactionType = document.getElementById("transactionType").value.trim();
+                const transactionMode = document.getElementById("transactionMode").value.trim();
+                const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
+                const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
+                const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
+
+                if (!customerName || !phoneNumber || !date || !transactionType || !transactionMode) {
+                    showAlert("Please fill in all required fields.", 3000);
+                    return;
+                }
+
+                saveOrUpdateTransaction(customerName, phoneNumber, date, transactionType, transactionMode, initialPayment, totalAmount, balanceAmount);
+            };
+
+            // Add event listener for the save button
             document.getElementById("creditsave").addEventListener("click", () => {
-                window.validateAndSaveTransaction();
+                validateAndSaveTransaction();
             });
+
         </script>
-
-
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script>
