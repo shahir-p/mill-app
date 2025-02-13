@@ -256,24 +256,54 @@
                     const customerName = document.getElementById("customerNameName").value.trim();
                     const phoneNumber = document.getElementById("phoneNumber").value.trim();
                     const date = document.getElementById("dateField").value.trim();
-                    const transactionType = document.getElementById("transactionType").value;
-                    const transactionMode = document.getElementById("transactionMode").value;
+                    const transactionType = document.getElementById("transactionType").value.trim();
+                    const transactionMode = document.getElementById("transactionMode").value.trim();
                     const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
                     const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
                     const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
 
-                    if (!customerName || !phoneNumber || !date || !transactionType) {
+                    // Check if all required fields are filled
+                    if (!customerName || !phoneNumber || !date || !transactionType || !transactionMode) {
                         showAlert("All fields are required.", 2500);
+
                         return;
                     }
 
+                    // Validate phone number (must be exactly 10 digits)
+                    if (!/^\d{10}$/.test(phoneNumber)) {
+                        showAlert("Phone number must be exactly 10 digits.", 2500);
+        
+                        return;
+                    }
+
+                    // Check if initial payment equals total amount and transaction type is "credit"
+                    if (initialPayment === totalAmount && transactionType === "credit") {
+                        showAlert("Transaction type cannot be 'Credit' when the full amount is paid.", 2500);
+                   
+                        return;
+                    }
+
+                    // Validate the items table
                     const table = document.getElementById("itemTable").querySelector("tbody");
                     if (!table || table.rows.length === 0) {
                         showAlert("Add at least one item.", 2500);
+                        
                         return;
                     }
 
-                    await saveOrUpdateTransaction(customerName, phoneNumber, date, transactionType, transactionMode, initialPayment, totalAmount, balanceAmount);
+                    console.log("All validations passed. Proceeding to save or update transaction...");
+
+                    // Proceed with saving or updating the transaction
+                    await saveOrUpdateTransaction(
+                        customerName,
+                        phoneNumber,
+                        date,
+                        transactionType,
+                        transactionMode,
+                        initialPayment,
+                        totalAmount,
+                        balanceAmount
+                    );
                 } catch (error) {
                     console.error("Error during validation and save:", error);
                 }
@@ -380,7 +410,7 @@
                         };
 
                         await addDoc(billsRef, data);
-                        showAlert("Transaction saved successfully!", 3000);
+                        // showAlert("Transaction saved successfully!", 3000);
                     }
 
                     window.pdfload();
@@ -401,24 +431,6 @@
                 }, duration);
             };
 
-            // Validate input fields and call saveOrUpdateTransaction
-            const validateAndSaveTransaction = () => {
-                const customerName = document.getElementById("customerNameName").value.trim();
-                const phoneNumber = document.getElementById("phoneNumber").value.trim();
-                const date = document.getElementById("dateField").value.trim();
-                const transactionType = document.getElementById("transactionType").value.trim();
-                const transactionMode = document.getElementById("transactionMode").value.trim();
-                const initialPayment = parseFloat(document.getElementById("initialPayment").value || "0");
-                const totalAmount = parseFloat(document.getElementById("credtotal").textContent || "0");
-                const balanceAmount = parseFloat(document.getElementById("balanceAmount").textContent || "0");
-
-                if (!customerName || !phoneNumber || !date || !transactionType || !transactionMode) {
-                    showAlert("Please fill in all required fields.", 3000);
-                    return;
-                }
-
-                saveOrUpdateTransaction(customerName, phoneNumber, date, transactionType, transactionMode, initialPayment, totalAmount, balanceAmount);
-            };
 
             // Add event listener for the save button
             document.getElementById("creditsave").addEventListener("click", () => {
@@ -888,6 +900,8 @@
             // Total payable amount (Example value, you can replace it dynamically)
             let totalPayable = 1000.00; // Example total amount
 
+
+
             // Show or hide fields based on transaction type
 
 
@@ -935,8 +949,8 @@
 
 
             navigate.addEventListener("click", () => {
-            window.history.back();
-        });
+                window.history.back();
+            });
 
 
 
