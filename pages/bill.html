@@ -253,6 +253,8 @@
 
             window.validateAndSaveTransaction = async function validateAndSaveTransaction() {
                 try {
+                    const saveButton = document.getElementById("creditsave"); // Replace with the actual ID of your save button
+                    saveButton.disabled = true; // Disable the button immediately after clicking
                     const customerName = document.getElementById("customerNameName").value.trim();
                     const phoneNumber = document.getElementById("phoneNumber").value.trim();
                     const date = document.getElementById("dateField").value.trim();
